@@ -19,27 +19,12 @@ public abstract class CrudServiceImpl<T,ID> implements CrudService<T, ID> {
         this.repository = repository;
     }
 
-    @Transactional(readOnly = true)
-    public Page<T> read(Pageable pageable) {
-        return repository.findAll(pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public List<T> read() {
-        return repository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<T> getById(ID id) { return repository.findById(id); }
-
-    @Transactional(readOnly = true)
-    public T getOrThrow(ID id) {
-        return repository.findById(id).orElseThrow(() -> 
-            new ResourceNotFoundException("objeto não encontrado"));
-    }
-
     public T create(T entity) { 
         return repository.save(entity);
+    }
+
+    public List<T> createAll(List<T> list) {
+        return repository.saveAll(list);
     }
 
     public T update(ID id, T source) {
@@ -50,12 +35,25 @@ public abstract class CrudServiceImpl<T,ID> implements CrudService<T, ID> {
         var existing = getOrThrow(id);
         repository.delete(existing);
     }
+
+    public Page<T> read(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+    @Transactional(readOnly = true)
+    public List<T> read() {
+        return repository.findAll();
+    }
+    @Transactional(readOnly = true)
+    public Optional<T> getById(ID id) { 
+        return repository.findById(id); 
+    }
+    @Transactional(readOnly = true)
+    public T getOrThrow(ID id) {
+        return repository.findById(id).orElseThrow(() -> 
+            new ResourceNotFoundException("objeto não encontrado"));
+    }
     @Transactional(readOnly = true)
     public boolean existsById(ID id) {
         return repository.existsById(id);
-    }
-
-    public List<T> createAll(List<T> list) {
-        return repository.saveAll(list);
     }
 }

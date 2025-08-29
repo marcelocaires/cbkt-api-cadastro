@@ -53,7 +53,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html","/actuator/**").permitAll()
+                .requestMatchers("/","/auth/**","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html","/actuator/**","/swagger-ui/index.html").anonymous()
                 .anyRequest().authenticated()
             );
 

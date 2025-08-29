@@ -1,11 +1,14 @@
 package br.dev.mmc.cbkt.domain;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,20 +17,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Entity
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor @Builder
 @EqualsAndHashCode(of = "id")
-@Table(name = "CLUBE")
-public class Clube{
+@Entity @Table(name = "CLUBE")
+public class Clube {
 
     @Id
     @Column(name = "CODIGOCLUBE")
     private Long id;
 
+    // Dados gerais
     @Column(name = "NOMECLUBE", nullable = false, length = 120)
     private String nome;
 
@@ -37,6 +37,22 @@ public class Clube{
     @Column(name = "CLASSIFICACAO", length = 30)
     private String classificacao;
 
+    @Column(name = "CNPJ", length = 18)
+    private String cnpj;
+
+    @Column(name = "RESPONSAVEL", length = 120)
+    private String responsavel;
+
+    @Column(name = "PRESIDENTE", length = 120)
+    private String presidente;
+
+    @Column(name = "DIRETORTECNICO", length = 120)
+    private String diretorTecnico;
+
+    @Column(name = "DATAFUNDACAO")
+    private LocalDate dataFundacao;
+
+    // Endereço
     @Column(name = "CIDADE", length = 80)
     private String cidade;
 
@@ -55,60 +71,14 @@ public class Clube{
     @Column(name = "COMPLEMENTO", length = 80)
     private String complemento;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "COD_MUNICIPIO")
+    private Municipio municipio;
+
+    // Contato
     @Column(name = "TELEFONE", length = 30)
     private String telefone;
 
     @Column(name = "EMAIL", length = 120)
     private String email;
-
-    @Column(name = "RESPONSAVEL", length = 120)
-    private String responsavel;
-
-    @Column(name = "DATAFUNDACAO")
-    private LocalDate dataFundacao;
-
-    @Column(name = "DIMENSAODE", length = 30)
-    private String dimensaoDe;
-
-    @Column(name = "CNPJ", length = 18)
-    private String cnpj;
-
-    @Column(name = "AN_MEN_DEBITO_1AV")
-    private Integer anMenDebito1Av;
-
-    @Column(name = "AN_MEN_DEBITO_2AV")
-    private Integer anMenDebito2Av;
-
-    @Column(name = "AN_MEN_DEBITO_3AV")
-    private Integer anMenDebito3Av;
-
-    @Column(name = "VALOR_MENSALIDADE_CLUBE", precision = 15, scale = 2)
-    private BigDecimal valorMensalidadeClube;
-
-    @Column(name = "MASCARA_CONTA", length = 30)
-    private String mascaraConta;
-
-    @Column(name = "CTA_DES_DESCONTO", length = 30)
-    private String ctaDesconto;
-
-    @Column(name = "CTA_DES_JUROS", length = 30)
-    private String ctaJuros;
-
-    @Column(name = "CTA_DES_MULTA", length = 30)
-    private String ctaMulta;
-
-    @Column(name = "CTA_REC_DESCONTO", length = 30)
-    private String ctaRecDesconto;
-
-    @Column(name = "CTA_REC_JUROS", length = 30)
-    private String ctaRecJuros;
-
-    @Column(name = "CTA_REC_MULTA", length = 30)
-    private String ctaRecMulta;
-
-    @Column(name = "PRESIDENTE", length = 120)
-    private String presidente;
-
-    @Column(name = "DIRETORTECNICO", length = 120)
-    private String diretorTecnico;
 }
