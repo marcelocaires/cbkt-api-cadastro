@@ -22,11 +22,6 @@ public class AtletaController extends CrudController<Atleta, Long> {
         this.atletaService = service;
     }
 
-    @GetMapping("/cpf/{cpf}")
-    public Atleta findByCpf(@PathVariable String cpf) {
-        return atletaService.findByCpf(cpf);
-    }
-
     @GetMapping("/nome/{nome}")
     public List<Atleta> findByNome(@PathVariable String nome) {
         return atletaService.findByNome(nome);
