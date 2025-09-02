@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.dev.mmc.cbkt.domain.Atleta;
+import br.dev.mmc.cbkt.domain.record.AtletaGraduacoesRecord;
 import br.dev.mmc.cbkt.service.AtletaService;
 
 @RestController
@@ -29,6 +30,11 @@ public class AtletaController extends CrudController<Atleta, Long> {
     @GetMapping("/nome/{nome}")
     public List<Atleta> findByNome(@PathVariable String nome) {
         return atletaService.findByNome(nome);
+    }
+
+    @GetMapping("/graduacoes/nome/{nome}")
+    public List<AtletaGraduacoesRecord> findGraduacoesByNome(@PathVariable String nome) {
+        return atletaService.findGraduacoesByNome(nome);
     }
 
 }

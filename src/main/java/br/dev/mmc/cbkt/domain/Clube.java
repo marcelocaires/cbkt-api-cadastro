@@ -2,10 +2,15 @@ package br.dev.mmc.cbkt.domain;
 
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,29 +54,18 @@ public class Clube {
     @Column(name = "DATAFUNDACAO")
     private LocalDate dataFundacao;
 
-    // Endereço
-    @Column(name = "CIDADE", length = 80)
-    private String cidade;
-
-    @Column(name = "CEP", length = 10)
-    private String cep;
-
-    @Column(name = "LOGRADOURO", length = 120)
-    private String logradouro;
-
-    @Column(name = "NUMERO", length = 15)
-    private String numero;
-
-    @Column(name = "BAIRRO", length = 80)
-    private String bairro;
-
-    @Column(name = "COMPLEMENTO", length = 80)
-    private String complemento;
-
     // Contato
     @Column(name = "TELEFONE", length = 30)
     private String telefone;
 
     @Column(name = "EMAIL", length = 120)
     private String email;
+
+    @Embedded
+    private Endereco endereco;
+
+    // Relacionamento com AtletaClube
+    @OneToMany(mappedBy = "clube", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<AtletaClube> atletas = new LinkedHashSet<>();
 }

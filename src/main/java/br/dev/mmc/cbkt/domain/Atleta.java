@@ -1,11 +1,17 @@
 package br.dev.mmc.cbkt.domain;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,21 +40,6 @@ public class Atleta {
     @Column(name = "DATACADASTRO")
     private LocalDate dataCadastro;
 
-    @Column(name = "CPFATLETA", length = 14)
-    private String cpfAtleta;
-
-    @Column(name = "RG_NUMERO", length = 20)
-    private String rgNumero;
-
-    @Column(name = "RG_ORGAO", length = 20)
-    private String rgOrgao;
-
-    @Column(name = "RG_ESTADO", length = 2)
-    private String rgEstado;
-
-    @Column(name = "CERTIDAONASCIMENTO", length = 50)
-    private String certidaoNascimento;
-
     @Column(name = "SEXO", length = 1)
     private String sexo;
 
@@ -60,9 +51,6 @@ public class Atleta {
 
     @Column(name = "FILIACAO_PAI", length = 120)
     private String filiacaoPai;
-
-    @Column(name = "EMAIL", length = 120)
-    private String email;
 
     @Column(name = "DIAANUIDADE")
     private Integer diaAnuidade;
@@ -109,9 +97,6 @@ public class Atleta {
     @Column(name = "URL_FOTO", length = 255)
     private String urlFoto;
 
-    @Column(name = "CPF", length = 14)
-    private String cpf;
-
     @Column(name = "DATAFAIXA")
     private LocalDate dataFaixa;
 
@@ -133,9 +118,23 @@ public class Atleta {
     @Column(name = "OBSERVACAO", length = 255)
     private String observacao;
 
-    @Column(name = "RG", length = 20)
-    private String rg;
-    
+    @Embedded
+    private Documentos documentos;
+
     @Embedded
     private Endereco endereco;
+
+    @Embedded
+    private Contato contato;
+
+    // Relacionamento com AtletaClube
+    @JsonIgnore
+    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<AtletaClube> clubes = new LinkedHashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Builder.Default
+    private Set<AtletaGraduacao> graduacoes = new LinkedHashSet<>();
 }

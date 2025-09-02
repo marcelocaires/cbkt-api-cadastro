@@ -24,7 +24,7 @@ public abstract class CrudController<T, ID> {
     }
 
     @GetMapping("")
-    public Iterable<T> getAll() {
+    public Iterable<T> read() {
         return service.read();
     }
 
