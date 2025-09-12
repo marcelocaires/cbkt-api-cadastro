@@ -11,6 +11,7 @@ import br.dev.mmc.cbkt.controller.forms.TokenPasswordForm;
 import br.dev.mmc.cbkt.controller.responses.JwtResponse;
 import br.dev.mmc.cbkt.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,47 +22,48 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public JwtResponse login(@RequestBody LoginForm req, HttpServletRequest http) {
+    public JwtResponse login(@RequestBody @Valid LoginForm form, HttpServletRequest http) {
+        System.out.println(clientIp(http));
         String jwt = authService.login(
-                req.email(),
-                req.senha(),
-                clientIp(http),
-                http.getHeader("User-Agent")
+            form.getEmail(),
+            form.getSenha(),
+            clientIp(http),
+            http.getHeader("User-Agent")
         );
         return new JwtResponse(jwt);
     }
 
     @PostMapping("/enroll")
-    public void concluir(@RequestBody TokenPasswordForm dto, HttpServletRequest http) {
+    public void concluir(@RequestBody TokenPasswordForm form, HttpServletRequest http) {
         authService.concluirDefinicaoOuResetSenha(
-                dto.token(),
-                dto.novaSenha(),
+                form.getToken(),
+                form.getNovaSenha(),
                 clientIp(http),
                 http.getHeader("User-Agent")
         );
     }
 
     @PostMapping("/forgot-password")
-    public void forgot(@RequestBody EmailForm dto, HttpServletRequest http) {
+    public void forgot(@RequestBody EmailForm form, HttpServletRequest http) {
         authService.solicitarResetSenha(
-                dto.email(),
+                form.getEmail(),
                 clientIp(http),
                 http.getHeader("User-Agent")
         );
     }
 
     @PostMapping("/reset-password")
-    public void reset(@RequestBody TokenPasswordForm dto, HttpServletRequest http) {
+    public void reset(@RequestBody TokenPasswordForm form, HttpServletRequest http) {
         authService.concluirDefinicaoOuResetSenha(
-                dto.token(),
-                dto.novaSenha(),
+                form.getToken(),
+                form.getNovaSenha(),
                 clientIp(http),
                 http.getHeader("User-Agent")
         );
     }
 
     private static String clientIp(HttpServletRequest req) {
-        String h = req.getHeader("X-Forwarded-For");
+        String h = req.getHeader("ip");
         return (h != null && !h.isBlank()) ? h.split(",")[0].trim() : req.getRemoteAddr();
     }
 }

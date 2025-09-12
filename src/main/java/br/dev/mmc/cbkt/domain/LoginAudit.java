@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="LOGIN_AUDIT", indexes=@Index(name="IDX_LOGIN_AUDIT_USER", columnList="USUARIO_ID"))
+@Table(name="LOGIN_AUDIT", indexes=@Index(name="IDX_LOGIN_AUDIT_USER", columnList="USUARIO_ID"),schema ="auth")
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class LoginAudit {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

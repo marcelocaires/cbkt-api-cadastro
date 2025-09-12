@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "USUARIO", uniqueConstraints = @UniqueConstraint(name="UK_USUARIO_EMAIL", columnNames="EMAIL"))
+@Table(name = "USUARIO", uniqueConstraints = @UniqueConstraint(name="UK_USUARIO_EMAIL", columnNames="EMAIL"),schema ="auth")
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class Usuario {
 

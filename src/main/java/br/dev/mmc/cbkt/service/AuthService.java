@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import br.dev.mmc.cbkt.config.security.JwtUtil;
 import br.dev.mmc.cbkt.domain.Atleta;
 import br.dev.mmc.cbkt.domain.LoginAudit;
 import br.dev.mmc.cbkt.domain.PasswordToken;
@@ -35,7 +36,7 @@ public class AuthService {
     private final LoginAuditRepository auditRepo;
     private final PasswordEncoder passwordEncoder;
     private final Mailer mailer;
-    private final JwtIssuer jwtIssuer;
+    private final JwtUtil jwtUtil;
 
     public void provisionarUsuarioParaAtleta(Atleta atleta) {
         if (atleta == null || atleta.getContato().getEmail() == null || atleta.getContato().getEmail().isBlank()) return;
@@ -96,7 +97,7 @@ public class AuthService {
         }
 
         registrarLogin(u, true, null, ip, ua);
-        return jwtIssuer.issueFor(u);
+        return jwtUtil.generateToken(u);
     }
 
     public void registrarLogin(Usuario u, boolean success, String failure, String ip, String ua) {
@@ -105,13 +106,13 @@ public class AuthService {
             usuarioRepo.save(u);
         }
         auditRepo.save(LoginAudit.builder()
-                .usuario(u)
-                .loginAt(Instant.now())
-                .success(success)
-                .failureReason(failure)
-                .ip(ip)
-                .userAgent(ua)
-                .build());
+            .usuario(u)
+            .loginAt(Instant.now())
+            .success(success)
+            .failureReason(failure)
+            .ip(ip)
+            .userAgent(ua)
+            .build());
     }
 
     private void enviarToken(Usuario u, TokenTypeEnum type, Duration ttl) {

@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="PASSWORD_TOKEN", indexes = @Index(name="IDX_TOKEN", columnList="TOKEN", unique=true))
+@Table(name="PASSWORD_TOKEN", indexes = @Index(name="IDX_TOKEN", columnList="TOKEN", unique=true),schema ="auth")
 @Getter 
 @Setter 
 @Builder 

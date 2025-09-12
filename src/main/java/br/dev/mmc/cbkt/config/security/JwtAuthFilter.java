@@ -1,4 +1,4 @@
-package br.dev.mmc.cbkt.config;
+package br.dev.mmc.cbkt.config.security;
 
 import java.io.IOException;
 

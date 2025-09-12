@@ -28,10 +28,10 @@ public class UsuarioDetailsService implements UserDetailsService {
         var auths = u.getRoles().stream().map(SimpleGrantedAuthority::new).toList();
 
         return User.withUsername(u.getEmail())
-                .password(Objects.toString(u.getSenha(), ""))
-                .authorities(auths)
-                .accountLocked(u.getStatus() == StatusUsuarioEnum.LOCKED || !u.getAtivo())
-                .disabled(!u.getAtivo())
-                .build();
+            .password(Objects.toString(u.getSenha(), ""))
+            .authorities(auths)
+            .accountLocked(u.getStatus() == StatusUsuarioEnum.LOCKED || !u.getAtivo())
+            .disabled(!u.getAtivo())
+            .build();
     }
 }
