@@ -56,7 +56,8 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/","/auth/**","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html","/actuator/**","/swagger-ui/index.html").anonymous()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
+                //.anyRequest().authenticated()
             );
 
         // Insere o filtro que processa Authorization: Bearer <token>

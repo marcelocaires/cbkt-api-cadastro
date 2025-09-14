@@ -1,9 +1,10 @@
 package br.dev.mmc.cbkt.domain;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -38,13 +39,14 @@ public class Atleta {
     private String nomeAtleta;
 
     @Column(name = "DATACADASTRO")
-    private LocalDate dataCadastro;
+    private Date dataCadastro;
 
     @Column(name = "SEXO", length = 1)
     private String sexo;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Column(name = "DATANASCIMENTO")
-    private LocalDate dataNascimento;
+    private Date dataNascimento;
 
     @Column(name = "FILIACAO_MAE", length = 120)
     private String filiacaoMae;
@@ -98,7 +100,7 @@ public class Atleta {
     private String urlFoto;
 
     @Column(name = "DATAFAIXA")
-    private LocalDate dataFaixa;
+    private Date dataFaixa;
 
     @Column(name = "GRADUACAO", length = 30)
     private String graduacao;

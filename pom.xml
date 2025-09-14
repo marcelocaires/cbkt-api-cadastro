@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.dev.mmc</groupId>
-	<artifactId>cbkt-api</artifactId>
+	<artifactId>cbkt-api-cadastro</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>cbkt-api</name>
+	<name>cbkt-api-cadastro</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

@@ -2,6 +2,8 @@ package br.dev.mmc.cbkt.controller.forms;
 
 import java.io.Serializable;
 
+import org.hibernate.validator.constraints.br.CPF;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +12,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class LoginForm implements Serializable{
+public class AtletaValidarForm implements Serializable{
+
 	private static final long serialVersionUID = 1L;
 	
 	@NotNull(message = "Informe um email.") 
@@ -18,7 +21,12 @@ public class LoginForm implements Serializable{
 	@Email(message = "Informe um email válido.") 
 	private String email;
 
-	@NotNull(message = "Informe uma senha válida.") 
-	@NotEmpty(message = "Informe uma senha válida.") 
-	private String senha;
+	@NotNull(message = "Informe a data de nascimento.") 
+	@NotEmpty(message = "Informe a data de nascimento.") 
+	private String dtNascimento;
+
+	@NotNull(message = "Informe o CPF.") 
+	@NotEmpty(message = "Informe o CPF.") 
+	@CPF(message = "CPF inválido.") 
+	private String cpf;
 }

@@ -1,14 +1,10 @@
 package br.dev.mmc.cbkt.config.security;
 
-import java.time.Instant;
-import java.util.Date;
-
 import javax.crypto.SecretKey;  // <- importante
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import br.dev.mmc.cbkt.domain.Usuario;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -26,16 +22,6 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretBase64));
     }
 
-    public String generateToken(String username) {
-        Instant now = Instant.now();
-        return Jwts.builder()
-                .subject(username)
-                .issuedAt(Date.from(now))
-                .expiration(Date.from(now.plusSeconds(expirationSeconds)))
-                .signWith(key())
-                .compact();
-    }
-
     public String validateAndGetSubject(String token) {
         return Jwts.parser()
                 .verifyWith(key())
@@ -43,17 +29,5 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
-    }
-
-    public String generateToken(Usuario usuario) {
-        Instant now = Instant.now();
-        return Jwts.builder()
-            .subject(usuario.getEmail())
-            .claim("roles", usuario.getRoles())
-            .claim("id", usuario.getId())
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plusSeconds(3600))) // 1h
-            .signWith(key())
-            .compact();
     }
 }

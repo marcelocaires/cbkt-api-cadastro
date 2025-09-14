@@ -1,5 +1,6 @@
 package br.dev.mmc.cbkt.repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,5 +50,19 @@ public interface AtletaRepository extends JpaRepository<Atleta, Long> {
     List<Atleta> findGraduacoesByFiltro(
         @Param("nome") String nome,
         @Param("cpf") String cpf
+    );
+
+    @EntityGraph(type = EntityGraph.EntityGraphType.LOAD, attributePaths = {"graduacoes", "graduacoes.graduacao"})
+    @Query("""
+        select distinct a
+          from Atleta a
+         where a.dataNascimento = :dtNascimento
+           and a.contato.email = :email
+           and a.documentos.cpf = :cpf
+        """)
+    Optional<Atleta> findAtleta(
+        @Param("dtNascimento") Date dtNascimento,
+        @Param("cpf") String cpf,
+        @Param("email") String email
     );
 }
