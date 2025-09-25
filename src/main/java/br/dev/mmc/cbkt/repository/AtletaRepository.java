@@ -27,25 +27,24 @@ public interface AtletaRepository extends JpaRepository<Atleta, Long> {
 
     // Consulta paginada com filtros e o mesmo grafo (sem fetch join)
     @EntityGraph(type = EntityGraph.EntityGraphType.LOAD, attributePaths = {"graduacoes", "graduacoes.graduacao"})
-    @Query("""
+    @Query(
+    """
         select distinct a
-          from Atleta a
-         where (:nome is null or upper(a.nomeAtleta) like upper(concat('%', :nome, '%')))
-           and (:cpf  is null or a.documentos.cpf = :cpf)
-        """)
+        from Atleta a
+        where (:nome is not null and upper(a.nomeAtleta) like upper(concat('%', :nome, '%')))
+           or (:cpf  is not null and a.documentos.cpf = :cpf)
+    """)
     Page<Atleta> findGraduacoesByFiltro(
         @Param("nome") String nome,
         @Param("cpf") String cpf,
         Pageable pageable
     );
 
-        // Consulta paginada com filtros e o mesmo grafo (sem fetch join)
-    @EntityGraph(type = EntityGraph.EntityGraphType.LOAD, attributePaths = {"graduacoes", "graduacoes.graduacao"})
     @Query("""
         select distinct a
           from Atleta a
-         where (:nome is null or upper(a.nomeAtleta) like upper(concat('%', :nome, '%')))
-           and (:cpf  is null or a.documentos.cpf = :cpf)
+         where (:nome is not null and a.nomeAtleta like :nome)
+           or (:cpf  is not null and a.documentos.cpf = :cpf)
         """)
     List<Atleta> findGraduacoesByFiltro(
         @Param("nome") String nome,

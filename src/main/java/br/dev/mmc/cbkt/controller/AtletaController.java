@@ -1,6 +1,5 @@
 package br.dev.mmc.cbkt.controller;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,6 @@ import br.dev.mmc.cbkt.controller.responses.AtletaValidadoRecord;
 import br.dev.mmc.cbkt.domain.Atleta;
 import br.dev.mmc.cbkt.domain.record.AtletaGraduacoesRecord;
 import br.dev.mmc.cbkt.service.AtletaService;
-import br.dev.mmc.cbkt.util.JodaTimeUtil;
 import jakarta.validation.Valid;
 
 
@@ -35,6 +33,11 @@ public class AtletaController extends CrudController<Atleta, Long> {
         return atletaService.findByNome(nome);
     }
 
+    @GetMapping("/cpf/{cpf}")
+    public List<Atleta> findByCpf(@PathVariable String cpf) {
+        return atletaService.findByCpf(cpf);
+    }
+
     @GetMapping("/graduacoes/nome/{nome}")
     public List<AtletaGraduacoesRecord> findGraduacoesByNome(@PathVariable String nome) {
         return atletaService.findGraduacoesByNome(nome);
@@ -42,15 +45,7 @@ public class AtletaController extends CrudController<Atleta, Long> {
 
     @PostMapping("/validar")
     public AtletaValidadoRecord postMethodName(@RequestBody @Valid AtletaValidarForm form) {
-        
-        return new AtletaValidadoRecord(
-            atletaService.validarAtleta(form).id(),
-            atletaService.validarAtleta(form).nome(),
-            atletaService.validarAtleta(form).email(),
-            atletaService.validarAtleta(form).dtNascimento(),
-            atletaService.validarAtleta(form).cpf(),
-            atletaService.validarAtleta(form).graduacao()
-        );
+        return atletaService.validarAtleta(form);
     }
     
 

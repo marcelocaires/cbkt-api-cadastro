@@ -1,0 +1,20 @@
+"codigograduacao","anuidade","anuidade_apos","anuidade_ate","carencia","carenciamenor","descricaograduacao","idademinima","valor"
+1,NAO,0,0,0,3,Branca (10º),5,0.00
+3,NAO,0,0,4,4,AZUL CL. (8º),5,48.00
+4,NAO,0,0,5,5,AMARELA (7º),6,55.00
+5,NAO,0,0,6,6,LARANJA (6º),6,61.00
+6,NAO,0,0,6,3,VERDE (5º),7,67.00
+11,NAO,0,0,9,6,ROXA (4º),7,77.00
+14,NAO,0,0,6,12,MARROM (1ºKYU),10,85.00
+15,NAO,0,0,6,0,Preta 1º DAN,12,1030.00
+16,NAO,0,0,36,0,Preta 2º DAN,24,1320.00
+17,NAO,0,0,48,0,Preta 3º DAN,25,1690.00
+18,NAO,0,0,60,0,Preta 4º DAN,30,2830.00
+19,NAO,0,0,72,0,Preta 5º DAN,36,3110.00
+20,NAO,0,0,84,0,Preta 6º DAN,43,3390.00
+21,NAO,0,0,96,0,Preta 7º DAN,51,2900.00
+2,NAO,0,0,3,0,CINZA (9º),5,44.00
+12,NAO,0,0,6,0,MARROM (3ºKYU),10,85.00
+13,NAO,0,0,6,0,MARROM (2ºKYU),9,85.00
+22,NAO,0,0,108,,Preta 8º Dan,62,3600.00
+23,NAO,0,0,8,,Vermelha/ANTIGA (7º),6,0.00

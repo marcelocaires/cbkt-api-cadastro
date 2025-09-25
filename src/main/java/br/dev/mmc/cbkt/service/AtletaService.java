@@ -27,7 +27,11 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
     }
 
     public List<Atleta> findByNome(String nome) {
-        return atletaRepository.searchByNome(nome).isEmpty() ? null : atletaRepository.searchByNome(nome);
+        return atletaRepository.findGraduacoesByFiltro(convertNome(nome),null);
+    }
+
+    public List<Atleta> findByCpf(String cpf) {
+        return atletaRepository.findGraduacoesByFiltro(null, cpf);
     }
 
     public List<AtletaGraduacoesRecord> findGraduacoesByNome(String nome) {
@@ -47,5 +51,14 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
         Atleta atleta = atletaRepository.findAtleta(dtNascimento, form.getCpf(), form.getEmail())
             .orElseThrow(() -> new ResourceNotFoundException("Atleta não encontrado."));
         return new AtletaValidadoRecord(atleta.getId(), atleta.getNomeAtleta(), atleta.getContato().getEmail(), dtNascimento, atleta.getDocumentos().getCpf(), atleta.getDescricaoGraduacao());
+   }
+
+   private String convertNome(String nome) {
+        return "%" + nome
+            .replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_")
+            .toUpperCase()
+            + "%";
    }
 }
