@@ -14,6 +14,8 @@ import br.dev.mmc.cbkt.controller.responses.AtletaValidadoRecord;
 import br.dev.mmc.cbkt.domain.Atleta;
 import br.dev.mmc.cbkt.domain.record.AtletaGraduacoesRecord;
 import br.dev.mmc.cbkt.service.AtletaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 
 
@@ -28,13 +30,29 @@ public class AtletaController extends CrudController<Atleta, Long> {
         this.atletaService = service;
     }
 
+    @GetMapping("/id/{id}")
+    public Atleta findById(@PathVariable Long id) {
+        return atletaService.findById(id);
+    }
+
     @GetMapping("/nome/{nome}")
     public List<Atleta> findByNome(@PathVariable String nome) {
         return atletaService.findByNome(nome);
     }
 
     @GetMapping("/cpf/{cpf}")
-    public List<Atleta> findByCpf(@PathVariable String cpf) {
+    @Operation(
+        summary = "Retorna atletas pelo CPF.",
+        description = """
+            Retorna uma lista de atletas que correspondem ao CPF fornecido.
+            - Se o CPF for encontrado → retorna 200 com a lista de atletas.
+            - Se o CPF não for encontrado → retorna 404.
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public List<Atleta> findByCpf(
+        @Parameter(description = "CPF do atleta", example = "123.456.789-00")
+        @PathVariable String cpf) {
         return atletaService.findByCpf(cpf);
     }
 

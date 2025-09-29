@@ -26,6 +26,10 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
         this.atletaRepository = atletaRepository;
     }
 
+    public Atleta findById(Long id) {
+        return atletaRepository.getAtletaById(id).orElse(null);
+    }
+
     public List<Atleta> findByNome(String nome) {
         return atletaRepository.findGraduacoesByFiltro(convertNome(nome),null);
     }

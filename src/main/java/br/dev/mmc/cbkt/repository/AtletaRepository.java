@@ -64,4 +64,12 @@ public interface AtletaRepository extends JpaRepository<Atleta, Long> {
         @Param("cpf") String cpf,
         @Param("email") String email
     );
+
+    @EntityGraph(type = EntityGraph.EntityGraphType.LOAD, attributePaths = {"graduacoes", "graduacoes.graduacao"})
+    @Query("""
+        select distinct a
+          from Atleta a
+         where a.id=:id
+        """)
+    Optional<Atleta> getAtletaById(@Param("id") Long id);
 }
