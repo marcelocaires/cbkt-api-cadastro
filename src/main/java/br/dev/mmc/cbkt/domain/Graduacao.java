@@ -2,8 +2,13 @@ package br.dev.mmc.cbkt.domain;
 
 import java.math.BigDecimal;
 
+import br.dev.mmc.cbkt.domain.enums.GraduacaoCorHexEnum;
+import br.dev.mmc.cbkt.domain.enums.GraduacaoCorNomeEnum;
+import br.dev.mmc.cbkt.domain.enums.GraduacaoGrauEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,6 +30,18 @@ public class Graduacao {
 
     @Column(name = "DESCRICAOGRADUACAO", length = 100)
     private String descricaoGraduacao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private GraduacaoGrauEnum grau;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "COR_NOME",length = 25)
+    private GraduacaoCorNomeEnum corNome;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "COR_CODIGO",length = 7)
+    private GraduacaoCorHexEnum corCodigo;
 
     @Column(name = "CARENCIA")
     private Integer carencia;
