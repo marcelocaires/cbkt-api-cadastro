@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # Aplicação CBKT Cadastro - PostgreSQL Externo
+  cbkt-api-cadastro:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: cbkt-api-cadastro
+    restart: unless-stopped
+    ports:
+      - '8082:8080'
+    environment:
+      # Profile do Spring
+      - SPRING_PROFILES_ACTIVE=prod
+      # Configurações do banco EXTERNO
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-cbkt}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASS=${DB_PASS:-postgres}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET:-MySecureJwtSecretKeyForProduction2024!}
+    # Usar rede host para acessar banco externo facilmente
+    network_mode: host
+    # Remover depends_on pois não há container de banco
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Não precisamos de volumes para PostgreSQL
+# Não precisamos de networks personalizadas com network_mode: host

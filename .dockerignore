@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+README.md
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Maven
+.mvn
+mvnw
+mvnw.cmd
+
+# Build artifacts que não são necessários
+target/classes
+target/test-classes
+target/maven-archiver
+target/maven-status
+target/generated-sources
+target/generated-test-sources
+target/surefire-reports
+
+# Manter apenas o JAR final
+!target/*.jar
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment
+.env
+.env.local
+.env.example
+
+# CSV files (dados de exemplo)
+db/*.csv

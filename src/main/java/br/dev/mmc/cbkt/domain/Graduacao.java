@@ -2,8 +2,7 @@ package br.dev.mmc.cbkt.domain;
 
 import java.math.BigDecimal;
 
-import br.dev.mmc.cbkt.domain.enums.GraduacaoCorHexEnum;
-import br.dev.mmc.cbkt.domain.enums.GraduacaoCorNomeEnum;
+import br.dev.mmc.cbkt.domain.enums.GraduacaoCorEnum;
 import br.dev.mmc.cbkt.domain.enums.GraduacaoGrauEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +10,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -32,16 +33,24 @@ public class Graduacao {
     private String descricaoGraduacao;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(nullable = true, length = 10)
     private GraduacaoGrauEnum grau;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "COR_NOME",length = 25)
-    private GraduacaoCorNomeEnum corNome;
+    @Setter(AccessLevel.NONE)
+    @Transient
+    private String grauNome;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "COR_CODIGO",length = 7)
-    private GraduacaoCorHexEnum corCodigo;
+    @Column(name = "COR",length = 25)
+    private GraduacaoCorEnum cor;
+
+    @Setter(AccessLevel.NONE)
+    @Transient
+    private String corNome;
+
+    @Setter(AccessLevel.NONE)
+    @Transient
+    private String corHex;
 
     @Column(name = "CARENCIA")
     private Integer carencia;
@@ -63,4 +72,16 @@ public class Graduacao {
 
     @Column(name = "ANUIDADE", length = 20)
     private String anuidade;
+
+    public String getGrauNome() {
+        return grau != null ? grau.getTitulo() : null;
+    }
+
+    public String getCorNome() {
+        return cor != null ? cor.getNome() : null;
+    }
+
+    public String getCorHex() {
+        return cor != null ? cor.getHex() : null;
+    }
 }

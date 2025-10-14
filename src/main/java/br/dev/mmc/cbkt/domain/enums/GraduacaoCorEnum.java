@@ -5,6 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
+
+@Getter
 public enum GraduacaoCorEnum {
 
     BRANCA(1, "Branca", "#FFFFFF"),
@@ -22,29 +25,17 @@ public enum GraduacaoCorEnum {
 
     private final int indice;
     private final String nome;
-    private final String codigo;
+    private final String hex;
 
-    GraduacaoCorEnum(int indice, String nome, String codigo) {
+    GraduacaoCorEnum(int indice, String nome, String hex) {
         this.indice = indice;
         this.nome = nome;
-        this.codigo = codigo;
-    }
-
-    public int getIndice() {
-        return indice;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getCodigo() {
-        return codigo;
+        this.hex = hex;
     }
 
     @Override
     public String toString() {
-        return indice + " - " + nome + " (" + codigo + ")";
+        return indice + " - " + nome + " (" + hex + ")";
     }
 
     /** 🔍 Busca pelo nome da cor (case-insensitive). */
@@ -59,10 +50,10 @@ public enum GraduacaoCorEnum {
     }
 
     /** 🎨 Busca pelo código da cor (case-insensitive). */
-    public static GraduacaoCorEnum getByCodigo(String codigo) {
-        if (codigo == null || codigo.isBlank()) return null;
+    public static GraduacaoCorEnum getByHex(String hex) {
+        if (hex == null || hex.isBlank()) return null;
         for (GraduacaoCorEnum cor : values()) {
-            if (cor.codigo.equalsIgnoreCase(codigo.trim())) {
+            if (cor.hex.equalsIgnoreCase(hex.trim())) {
                 return cor;
             }
         }
@@ -83,9 +74,10 @@ public enum GraduacaoCorEnum {
         List<Map<String, Object>> lista = new ArrayList<>();
         for (GraduacaoCorEnum cor : values()) {
             Map<String, Object> item = new LinkedHashMap<>();
+            item.put("codigo", cor);
             item.put("indice", cor.indice);
             item.put("nome", cor.nome);
-            item.put("codigo", cor.codigo);
+            item.put("hex", cor.hex);
             lista.add(item);
         }
         return lista;

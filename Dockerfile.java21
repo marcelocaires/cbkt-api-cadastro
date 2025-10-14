@@ -1,13 +1,15 @@
-# Usar multi-stage build para otimização
-# Java 25 Early Access - usando imagem oficial
-FROM openjdk:25-ea-jdk-slim AS runtime
+# Dockerfile alternativo usando Java 21 LTS (mais estável)
+# Use este arquivo se houver problemas com Java 25 EA
+# Para usar: docker build -f Dockerfile.java21 -t cbkt-api-cadastro .
+
+FROM eclipse-temurin:21-jre-alpine AS runtime
 
 # Criar usuário não-root para segurança
-RUN groupadd -g 1001 appgroup && \
-    useradd -u 1001 -g appgroup -m appuser
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
 
 # Instalar wget para health checks
-RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache wget
 
 # Definir diretório de trabalho
 WORKDIR /app
@@ -24,8 +26,8 @@ USER appuser
 # Expor a porta da aplicação
 EXPOSE 8080
 
-# Configurar JVM para container (Java 25)
-ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:+UseContainerSupport -XX:+EnableDynamicAgentLoading --add-opens java.base/java.lang=ALL-UNNAMED"
+# Configurar JVM para container (Java 21)
+ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:+UseContainerSupport"
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \

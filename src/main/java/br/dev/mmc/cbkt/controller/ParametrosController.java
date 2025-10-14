@@ -28,7 +28,6 @@ public class ParametrosController {
     public ResponseEntity<List<Map<String, Object>>> getCoresGraduacao() {
         List<Map<String, Object>> cores = GraduacaoCorEnum.listarTodos();
         return ResponseEntity.ok(cores.stream().map(c-> {
-            c.put("codigo", c.get("nome"));
             return c;
         }).collect(Collectors.toList()));
     }
@@ -42,7 +41,7 @@ public class ParametrosController {
         List<Map<String, String>> graus = Arrays.stream(GraduacaoGrauEnum.values())
             .map(grau -> Map.of(
                 "codigo", grau.name(),
-                "titulo", grau.getTitulo()
+                "grau", grau.getTitulo()
             ))
             .collect(Collectors.toList());
         

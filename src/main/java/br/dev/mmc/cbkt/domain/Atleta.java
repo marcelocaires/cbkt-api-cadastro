@@ -12,6 +12,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -63,11 +65,9 @@ public class Atleta {
     @Column(name = "CATEGORIA", length = 50)
     private String categoria;
 
-    @Column(name = "CODIGOGRADUACAO")
-    private Long codigoGraduacao;
-
-    @Column(name = "DESCRICAOGRADUACAO", length = 50)
-    private String descricaoGraduacao;
+    @ManyToOne
+    @JoinColumn(name = "CODIGOGRADUACAO")
+    private Graduacao graduacao;
 
     @Column(name = "CODIGOCLUBE")
     private Long codigoClube;
@@ -101,9 +101,6 @@ public class Atleta {
 
     @Column(name = "DATAFAIXA")
     private Date dataFaixa;
-
-    @Column(name = "GRADUACAO", length = 30)
-    private String graduacao;
 
     @Column(name = "NACIONALIDADE", length = 50)
     private String nacionalidade;
