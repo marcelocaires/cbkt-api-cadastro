@@ -1,10 +1,8 @@
 package br.dev.mmc.cbkt.service;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import br.dev.mmc.cbkt.config.exceptions.CustomBadRequestException;
@@ -54,7 +52,7 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
         }
         Atleta atleta = atletaRepository.findAtleta(dtNascimento, form.getCpf(), form.getEmail())
             .orElseThrow(() -> new ResourceNotFoundException("Atleta não encontrado."));
-        return new AtletaValidadoRecord(atleta.getId(), atleta.getNomeAtleta(), atleta.getContato().getEmail(), dtNascimento, atleta.getDocumentos().getCpf(), atleta.getDescricaoGraduacao());
+        return new AtletaValidadoRecord(atleta.getId(), atleta.getNomeAtleta(), atleta.getContato().getEmail(), dtNascimento, atleta.getDocumentos().getCpf(), atleta.getGraduacao().getDescricaoGraduacao());
    }
 
    private String convertNome(String nome) {

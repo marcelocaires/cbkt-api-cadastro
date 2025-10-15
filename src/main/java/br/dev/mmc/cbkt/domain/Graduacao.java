@@ -8,7 +8,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AccessLevel;
@@ -19,13 +22,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
+@Getter 
+@Setter
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder
 @EqualsAndHashCode(of = "id")
-@Entity @Table(name = "GRADUACAO")
+@Entity 
+@Table(name = "GRADUACAO")
 public class Graduacao {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "graduacao_seq")
+    @SequenceGenerator(name = "graduacao_seq", sequenceName = "graduacao_sequence", allocationSize = 1)
     @Column(name = "CODIGOGRADUACAO")
     private Long id;
 
@@ -57,6 +66,9 @@ public class Graduacao {
 
     @Column(name = "CARENCIAMENOR")
     private Integer carenciaMenor;
+
+    @Column(name = "NUMERO_AULAS")
+    private Integer numeroAulas;
 
     @Column(name = "VALOR", precision = 15, scale = 2)
     private BigDecimal valor;

@@ -1,0 +1,1 @@
+SELECT setval('graduacao_sequence', (SELECT MAX(codigograduacao) FROM graduacao));
