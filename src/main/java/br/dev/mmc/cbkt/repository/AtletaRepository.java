@@ -21,9 +21,14 @@ public interface AtletaRepository extends JpaRepository<Atleta, Long> {
 
 
     // Carrega o atleta + histórico de graduações (Atleta.graduacoes -> AtletaGraduacao.graduacao)
-    @EntityGraph(type = EntityGraph.EntityGraphType.LOAD,attributePaths = {"graduacoes", "graduacoes.graduacao"})
+    @EntityGraph(type = EntityGraph.EntityGraphType.LOAD,attributePaths = {"graduacoes","graduacoes.graduacao"})
     @Query("select a from Atleta a where a.id = :id")
-    Optional<Atleta> findDetalheComGraduacoes(@Param("id") Long id);
+    Optional<Atleta> findAtletaComGraduacoes(@Param("id") Long id);
+
+    // Carrega o atleta + histórico de clubes (Atleta.clubes -> AtletaClube.clube)
+    @EntityGraph(type = EntityGraph.EntityGraphType.LOAD,attributePaths = {"clubes","clubes.clube"})
+    @Query("select a from Atleta a where a.id = :id")
+    Optional<Atleta> findAtletaComClubes(@Param("id") Long id);
 
     // Consulta paginada com filtros e o mesmo grafo (sem fetch join)
     @EntityGraph(type = EntityGraph.EntityGraphType.LOAD, attributePaths = {"graduacoes", "graduacoes.graduacao"})

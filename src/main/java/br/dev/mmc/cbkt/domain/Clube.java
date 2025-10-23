@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -72,6 +74,7 @@ public class Clube {
     private Endereco endereco;
 
     // Relacionamento com AtletaClube
+    @JsonIgnore
     @OneToMany(mappedBy = "clube", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<AtletaClube> atletas = new LinkedHashSet<>();

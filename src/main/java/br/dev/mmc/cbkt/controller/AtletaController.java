@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.dev.mmc.cbkt.controller.forms.AtletaValidarForm;
+import br.dev.mmc.cbkt.controller.responses.AtletaDTO;
 import br.dev.mmc.cbkt.controller.responses.AtletaValidadoRecord;
 import br.dev.mmc.cbkt.domain.Atleta;
-import br.dev.mmc.cbkt.domain.record.AtletaGraduacoesRecord;
+import br.dev.mmc.cbkt.domain.AtletaGraduacao;
 import br.dev.mmc.cbkt.service.AtletaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,7 +32,7 @@ public class AtletaController extends CrudController<Atleta, Long> {
     }
 
     @GetMapping("/id/{id}")
-    public Atleta findById(@PathVariable Long id) {
+    public AtletaDTO findById(@PathVariable Long id) {
         return atletaService.findById(id);
     }
 
@@ -56,15 +57,13 @@ public class AtletaController extends CrudController<Atleta, Long> {
         return atletaService.findByCpf(cpf);
     }
 
-    @GetMapping("/graduacoes/nome/{nome}")
-    public List<AtletaGraduacoesRecord> findGraduacoesByNome(@PathVariable String nome) {
-        return atletaService.findGraduacoesByNome(nome);
+    @GetMapping("/graduacoes/id/{id}")
+    public List<AtletaGraduacao> findGraduacoesById(@PathVariable Long id) {
+        return atletaService.findGraduacoesById(id);
     }
 
     @PostMapping("/validar")
     public AtletaValidadoRecord postMethodName(@RequestBody @Valid AtletaValidarForm form) {
         return atletaService.validarAtleta(form);
     }
-    
-
 }

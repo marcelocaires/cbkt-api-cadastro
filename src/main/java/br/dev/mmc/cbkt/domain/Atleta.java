@@ -1,11 +1,10 @@
 package br.dev.mmc.cbkt.domain;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -131,14 +130,11 @@ public class Atleta {
     @Embedded
     private Contato contato;
 
-    // Relacionamento com AtletaClube
-    @JsonIgnore
-    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.LAZY)
     @Builder.Default
-    private Set<AtletaClube> clubes = new LinkedHashSet<>();
+    private List<AtletaClube> clubes = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = false, fetch = jakarta.persistence.FetchType.LAZY)
     @Builder.Default
-    private Set<AtletaGraduacao> graduacoes = new LinkedHashSet<>();
+    private List<AtletaGraduacao> graduacoes = new ArrayList<>();
 }
