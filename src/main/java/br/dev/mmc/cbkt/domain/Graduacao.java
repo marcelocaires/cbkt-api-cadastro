@@ -67,8 +67,8 @@ public class Graduacao {
     @Column(name = "CARENCIAMENOR")
     private Integer carenciaMenor;
 
-    @Column(name = "NUMERO_AULAS")
-    private Integer numeroAulas;
+    @Column(name = "CARENCIA_AULAS")
+    private Integer carenciaAulas;
 
     @Column(name = "VALOR", precision = 15, scale = 2)
     private BigDecimal valor;

@@ -82,7 +82,9 @@ public class AtletaDTO {
         this.documentos = atleta.getDocumentos();
         this.endereco = atleta.getEndereco();
         this.contato = atleta.getContato();
-        this.graduacoes = atleta.getGraduacoes();
+        this.graduacoes = atleta.getGraduacoes().stream()
+            .sorted((g1, g2) -> g2.getDataGraduacao().compareTo(g1.getDataGraduacao()))
+            .toList().reversed();
         this.graduacao = atleta.getGraduacao();
         this.clubes = clubes;
     }
