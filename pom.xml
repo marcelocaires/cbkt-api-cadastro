@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>br.dev.mmc</groupId>
 	<artifactId>cbkt-api-cadastro</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<name>cbkt-api-cadastro</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>

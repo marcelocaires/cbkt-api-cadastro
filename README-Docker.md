@@ -2,7 +2,7 @@
 
 ## 📋 Visão Geral
 
-Esta é a API de cadastro da CBKT, configurada para rodar com Docker Compose incluindo PostgreSQL.
+Esta é a API de cadastro da CBKT, configurada para rodar com Docker **conectando a um banco de dados PostgreSQL externo**.
 **Configurado para Java 25** conforme especificado no pom.xml.
 
 ## ☕ Versões Java Suportadas
@@ -13,6 +13,10 @@ Esta é a API de cadastro da CBKT, configurada para rodar com Docker Compose inc
 O script `start.sh` tenta automaticamente usar Java 25 e faz fallback para Java 21 se houver problemas.
 
 ## 🚀 Início Rápido
+
+### Pré-requisitos
+
+**IMPORTANTE**: Você precisa de um banco PostgreSQL rodando externamente. A aplicação Docker **NÃO** inclui mais o banco de dados.
 
 ### 1. Usar o script de inicialização (Recomendado)
 
@@ -28,25 +32,33 @@ O script `start.sh` tenta automaticamente usar Java 25 e faz fallback para Java 
 
 # 2. Configurar variáveis de ambiente
 cp .env.example .env
-# Edite o arquivo .env conforme necessário
+# OBRIGATÓRIO: Edite o arquivo .env com os dados do seu banco PostgreSQL externo
 
-# 3. Iniciar os serviços
+# 3. Iniciar o serviço
 docker-compose up --build -d
 ```
 
 ## 🔧 Configuração
 
-### Variáveis de Ambiente
+### Variáveis de Ambiente Obrigatórias
 
-Copie `.env.example` para `.env` e ajuste as seguintes variáveis:
+Copie `.env.example` para `.env` e configure as seguintes variáveis **OBRIGATÓRIAS**:
 
-- `DB_USER` / `DB_PASS`: Credenciais do PostgreSQL
-- `JWT_SECRET`: Chave secreta para JWT (use uma chave forte em produção)
+```bash
+# Banco PostgreSQL Externo (OBRIGATÓRIO)
+DB_HOST=localhost           # IP/hostname do seu PostgreSQL
+DB_PORT=5432               # Porta do PostgreSQL
+DB_NAME=cbkt               # Nome da base de dados
+DB_USER=postgres           # Usuário do banco
+DB_PASS=sua_senha_aqui     # Senha do banco
+
+# Segurança (OBRIGATÓRIO)
+JWT_SECRET=SuaChaveSecretaMuitoForteAqui123!
+```
 
 ### Portas
 
 - **Aplicação**: http://localhost:8082
-- **PostgreSQL**: localhost:5433 (para não conflitar com auth na 5432)
 - **Swagger UI**: http://localhost:8082/swagger-ui.html
 - **Health Check**: http://localhost:8082/actuator/health
 
@@ -67,11 +79,8 @@ curl http://localhost:8082/actuator/info
 ### Logs
 
 ```bash
-# Ver logs em tempo real
+# Ver logs da aplicação em tempo real
 docker-compose logs -f cbkt-api-cadastro
-
-# Ver logs do PostgreSQL
-docker-compose logs -f postgres
 
 # Ver todos os logs
 docker-compose logs -f
@@ -80,44 +89,66 @@ docker-compose logs -f
 ## 🛠️ Comandos Úteis
 
 ```bash
-# Parar todos os serviços
+# Parar o serviço
 docker-compose down
 
-# Parar e remover volumes (CUIDADO: apaga dados do banco)
-docker-compose down -v
-
-# Reiniciar apenas a aplicação
+# Reiniciar a aplicação
 docker-compose restart cbkt-api-cadastro
 
-# Reconstruir apenas a aplicação
+# Reconstruir a aplicação
 docker-compose up --build cbkt-api-cadastro
 
-# Verificar status dos containers
+# Verificar status do container
 docker-compose ps
 
 # Entrar no container da aplicação
 docker-compose exec cbkt-api-cadastro sh
-
-# Entrar no PostgreSQL
-docker-compose exec postgres psql -U postgres -d cbkt
 ```
 
-## 🗄️ Banco Externo
+## 🗄️ Configuração do Banco Externo
 
-Para usar PostgreSQL externo:
+### Opções de Banco PostgreSQL Externo
+
+1. **PostgreSQL Local**: Instalar PostgreSQL na máquina local
+2. **PostgreSQL em Container Separado**: Rodar PostgreSQL em container separado
+3. **PostgreSQL na Nuvem**: Usar serviços como AWS RDS, Google Cloud SQL, etc.
+
+### Exemplo: PostgreSQL Local
 
 ```bash
-# Usar configuração para banco externo
-docker-compose -f docker-compose.external-db.yml up --build -d
-```
+# Instalar PostgreSQL (Ubuntu/Debian)
+sudo apt update
+sudo apt install postgresql postgresql-contrib
 
-Configure as variáveis no `.env`:
-```bash
-DB_HOST=localhost  # ou IP do servidor PostgreSQL
+# Criar base de dados
+sudo -u postgres createdb cbkt
+
+# Configurar no .env
+DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=cbkt
 DB_USER=postgres
 DB_PASS=sua_senha
+```
+
+### Exemplo: PostgreSQL em Container Separado
+
+```bash
+# Rodar PostgreSQL em container separado
+docker run -d \
+  --name postgres-cbkt \
+  -e POSTGRES_DB=cbkt \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:15-alpine
+
+# Configurar no .env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=cbkt
+DB_USER=postgres
+DB_PASS=postgres
 ```
 
 ## 🔍 Solução de Problemas
@@ -140,24 +171,44 @@ Se houver problemas com Java 25 Early Access:
 
 ### Conflito de Portas
 
-Se a porta 5433 do PostgreSQL estiver em uso:
+Se a porta 8082 da aplicação estiver em uso:
 
 1. **Alterar porta no docker-compose.yml**:
    ```yaml
    ports:
-     - "5434:5432"  # ou outra porta disponível
+     - "8083:8080"  # ou outra porta disponível
+   ```
+
+### Problemas de Conexão com Banco
+
+1. **Verificar se o PostgreSQL externo está rodando**:
+   ```bash
+   # Testar conectividade
+   telnet localhost 5432
+   # ou
+   nc -zv localhost 5432
+   ```
+
+2. **Verificar credenciais no .env**:
+   ```bash
+   cat .env | grep DB_
+   ```
+
+3. **Testar conexão direta ao banco**:
+   ```bash
+   psql -h localhost -p 5432 -U postgres -d cbkt
    ```
 
 ### Aplicação não inicia
 
-1. Verifique se o PostgreSQL está rodando:
+1. Verifique os logs da aplicação:
    ```bash
-   docker-compose logs postgres
+   docker-compose logs cbkt-api-cadastro
    ```
 
-2. Verifique se a porta 8082 não está em uso:
+2. Verifique se as variáveis de ambiente estão configuradas:
    ```bash
-   netstat -tlnp | grep 8082
+   docker-compose exec cbkt-api-cadastro env | grep DB_
    ```
 
 ## 🏗️ Arquitetura
@@ -165,14 +216,16 @@ Se a porta 5433 do PostgreSQL estiver em uso:
 ```
 ┌─────────────────────┐    ┌─────────────────┐
 │   cbkt-api-cadastro │────│   PostgreSQL    │
-│   (Spring Boot)     │    │     (port       │
-│   (port 8082)       │    │      5433)      │
+│   (Spring Boot)     │    │   (Externo)     │
+│   (port 8082)       │    │                 │
 └─────────────────────┘    └─────────────────┘
         │
         ├── /actuator/health (Health Check)
         ├── /swagger-ui.html (API Docs)
         └── /api/** (API Endpoints)
 ```
+
+**Nota**: O PostgreSQL deve ser configurado e executado externamente ao Docker da aplicação.
 
 ## 🔒 Segurança
 
