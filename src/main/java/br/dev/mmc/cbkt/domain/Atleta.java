@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -130,10 +131,12 @@ public class Atleta {
     @Embedded
     private Contato contato;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.LAZY)
     @Builder.Default
     private List<AtletaClube> clubes = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = false, fetch = jakarta.persistence.FetchType.LAZY)
     @Builder.Default
     private List<AtletaGraduacao> graduacoes = new ArrayList<>();

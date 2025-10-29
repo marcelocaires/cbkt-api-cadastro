@@ -2,6 +2,8 @@ package br.dev.mmc.cbkt.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +31,20 @@ public class AtletaController extends CrudController<Atleta, Long> {
     AtletaController(AtletaService service) {
         super(service);
         this.atletaService = service;
+    }
+
+    @GetMapping("/page")
+    @Operation(
+        summary = "Retorna atletas com paginação.",
+        description = """
+            Retorna uma lista paginada de atletas.
+            - Parâmetros opcionais: page (número da página, padrão 0), size (tamanho da página, padrão 10), sort (campo de ordenação).
+            - Exemplo: /api/atleta/page?page=0&size=10&sort=nomeAtleta,asc
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public Page<Atleta> getAllPage(Pageable pageable) {
+        return atletaService.getAllPage(pageable);
     }
 
     @GetMapping("/id/{id}")

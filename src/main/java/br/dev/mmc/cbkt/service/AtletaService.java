@@ -3,6 +3,10 @@ package br.dev.mmc.cbkt.service;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.dev.mmc.cbkt.config.exceptions.CustomBadRequestException;
@@ -24,6 +28,13 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
     public AtletaService(AtletaRepository repo, AtletaRepository atletaRepository) {
         super(repo);
         this.atletaRepository = atletaRepository;
+    }
+
+    public Page<Atleta> getAllPage(Pageable pageable) {
+        if (pageable == null) {
+            pageable = PageRequest.of(0, 10, Sort.by("nomeAtleta").ascending());
+        }
+        return atletaRepository.findAll(pageable);
     }
 
     public AtletaDTO findById(Long id) {
