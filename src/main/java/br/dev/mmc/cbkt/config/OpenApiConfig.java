@@ -1,6 +1,7 @@
 package br.dev.mmc.cbkt.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -19,4 +20,5 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
     scheme = "bearer",
     bearerFormat = "JWT"
 )
+@Profile("dev") 
 public class OpenApiConfig { }
