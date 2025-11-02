@@ -30,11 +30,22 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
         this.atletaRepository = atletaRepository;
     }
 
-    public Page<Atleta> getAllPage(Pageable pageable) {
+    public Page<Atleta> getAllPage(Pageable pageable, String filtro) {
         if (pageable == null) {
             pageable = PageRequest.of(0, 10, Sort.by("nomeAtleta").ascending());
         }
+        if(filtro != null && !filtro.isBlank()) {
+            return atletaRepository.findPageByFiltroNome(filtro, pageable);
+        }
         return atletaRepository.findAll(pageable);
+    }
+
+    // Novo método para filtro por nome, graduação e clube
+    public Page<Atleta> filterPageByNGC(Pageable pageable, String filtro) {
+        if (pageable == null) {
+            pageable = PageRequest.of(0, 10, Sort.by("nomeAtleta").ascending());
+        }
+        return atletaRepository.findAll(AtletaRepository.filtroByNGC(filtro), pageable);
     }
 
     public AtletaDTO findById(Long id) {

@@ -1,12 +1,9 @@
 package br.dev.mmc.cbkt.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.dev.mmc.cbkt.controller.forms.AtletaValidarForm;
 import br.dev.mmc.cbkt.controller.responses.AtletaDTO;
+import br.dev.mmc.cbkt.controller.responses.AtletaShortDTO;
 import br.dev.mmc.cbkt.controller.responses.AtletaValidadoRecord;
 import br.dev.mmc.cbkt.domain.Atleta;
 import br.dev.mmc.cbkt.domain.AtletaGraduacao;
@@ -43,20 +41,16 @@ public class AtletaController extends CrudController<Atleta, Long> {
         description = """
             Retorna uma lista paginada de atletas.
             - Parâmetros opcionais: page (número da página, padrão 0), size (tamanho da página, padrão 10), sort (campo de ordenação, padrão nomeAtleta).
+            - Filtro opcional por nome, graduação ou clube via parâmetro 'filter'.
             - Exemplo: /api/atleta/page?page=0&size=10&sort=nomeAtleta,asc
             - Esse endpoint exige autenticação.
         """
     )
-    public Page<Atleta> getAllPage(
-        @RequestParam(required = false) Optional<Integer> page,
-        @RequestParam(required = false) Optional<Integer> size,
-        @RequestParam(required = false) Optional<String> sort
-    ){
-        Integer defaultPage = page.orElse(0);
-        Integer defaultSize = size.orElse(10);
-        Sort defaultSort = Sort.by(sort.orElse("nomeAtleta"));
-        Pageable pageable = PageRequest.of(defaultPage, defaultSize, defaultSort);
-        return atletaService.getAllPage(pageable);
+    public Page<AtletaShortDTO> getAllPage(
+        @RequestParam(required = false) String filter,
+        Pageable pageable){
+        return atletaService.filterPageByNGC(pageable, filter)
+            .map(AtletaShortDTO::new);
     }
 
     @GetMapping("/id/{id}")

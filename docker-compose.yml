@@ -13,7 +13,7 @@ services:
     network_mode: host
     environment:
       # Profile do Spring
-      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_PROFILES_ACTIVE=dev
       # Configurações do banco (devem ser fornecidas externamente)
       - DB_HOST=${DB_HOST:-localhost}
       - DB_PORT=${DB_PORT:-5432}

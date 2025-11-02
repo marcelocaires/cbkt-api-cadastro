@@ -6,14 +6,16 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import br.dev.mmc.cbkt.domain.Atleta;
 
-public interface AtletaRepository extends JpaRepository<Atleta, Long> {
+public interface AtletaRepository extends JpaRepository<Atleta, Long>, JpaSpecificationExecutor<Atleta> {
     Optional<Atleta> findByNomeAtleta(String nome);
 
     @Query("SELECT a FROM Atleta a WHERE a.nomeAtleta LIKE %:nome%")
@@ -42,6 +44,19 @@ public interface AtletaRepository extends JpaRepository<Atleta, Long> {
     Page<Atleta> findGraduacoesByFiltro(
         @Param("nome") String nome,
         @Param("cpf") String cpf,
+        Pageable pageable
+    );
+
+    // Consulta paginada com filtros e o mesmo grafo (sem fetch join)
+    @EntityGraph(type = EntityGraph.EntityGraphType.LOAD, attributePaths = {"graduacoes", "graduacoes.graduacao"})
+    @Query(
+    """
+        select distinct a
+        from Atleta a
+        where (:nome is not null and upper(a.nomeAtleta) like upper(concat('%', :nome, '%')))
+    """)
+    Page<Atleta> findPageByFiltroNome(
+        @Param("nome") String nome,
         Pageable pageable
     );
 
@@ -77,4 +92,24 @@ public interface AtletaRepository extends JpaRepository<Atleta, Long> {
          where a.id=:id
         """)
     Optional<Atleta> getAtletaById(@Param("id") Long id);
+
+    //Especificação para filtro por nome, graduação e clube
+    static Specification<Atleta> filtroByNGC(String filtro) {
+        return (root, cq, cb) -> {
+            if (filtro == null || filtro.isBlank()) {
+                return cb.conjunction(); // sem filtro
+            }
+
+            String like = "%" + filtro.trim().toLowerCase() + "%";
+
+            // join da graduação (se for entidade)
+            var graduacaoJoin = root.join("graduacao", jakarta.persistence.criteria.JoinType.LEFT);
+
+            return cb.or(
+                cb.like(cb.lower(root.get("nomeAtleta")), like),
+                cb.like(cb.lower(root.get("nomeClube")), like),
+                cb.like(cb.lower(graduacaoJoin.get("descricaoGraduacao")), like) // ajuste aqui se o campo da graduação for outro
+            );
+        };
+    }
 }
