@@ -10,7 +10,7 @@ import br.dev.mmc.cbkt.domain.record.EnderecoRecord;
 import br.dev.mmc.cbkt.service.EnderecoService;
 
 @RestController
-@RequestMapping("/api/endereco")
+@RequestMapping("/endereco")
 public class EnderecoController{
     private EnderecoService service;
 

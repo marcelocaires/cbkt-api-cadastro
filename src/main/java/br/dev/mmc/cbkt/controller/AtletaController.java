@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
 
 
 @RestController
-@RequestMapping("/api/atleta")
+@RequestMapping("/atleta")
 public class AtletaController extends CrudController<Atleta, Long> {
 
     private final AtletaService atletaService;

@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/parametros")
+@RequestMapping("/parametros")
 @Tag(name = "Parâmetros", description = "Endpoints para consultar enums e parâmetros do sistema")
 public class ParametrosController {
 

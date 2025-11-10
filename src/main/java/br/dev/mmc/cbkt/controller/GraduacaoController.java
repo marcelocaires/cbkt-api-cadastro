@@ -7,7 +7,7 @@ import br.dev.mmc.cbkt.domain.Graduacao;
 import br.dev.mmc.cbkt.service.GraduacaoService;
 
 @RestController
-@RequestMapping("/api/graduacao")
+@RequestMapping("/graduacao")
 public class GraduacaoController extends CrudController<Graduacao, Long> {
 
     private final GraduacaoService graduacaoService;

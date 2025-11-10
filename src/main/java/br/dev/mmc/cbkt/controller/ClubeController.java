@@ -13,7 +13,7 @@ import br.dev.mmc.cbkt.domain.record.ClubeDetalheRecord;
 import br.dev.mmc.cbkt.service.ClubeService;
 
 @RestController
-@RequestMapping("/api/clube")
+@RequestMapping("/clube")
 public class ClubeController extends CrudController<Clube, Long> {
     private final ClubeService service;
     ClubeController(ClubeService service) {
