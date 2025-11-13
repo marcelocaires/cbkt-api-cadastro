@@ -37,52 +37,88 @@ jobs:
       with:
         ref: ${{ github.event.inputs.branch }}
 
+    # ============================================================
+    # SSH CONFIG
+    # ============================================================
     - name: Setup SSH
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-        echo -e "Host *\n  StrictHostKeyChecking no\n" > ~/.ssh/config
+        
+        # Cria config SSH sem HEREDOC (evita erro de YAML)
+        printf "Host *\n  StrictHostKeyChecking no\n" > ~/.ssh/config
 
+    # ============================================================
+    # MAPEIA DIRETÓRIO REMOTO (dev / homo / prod)
+    # ============================================================
     - name: Definir diretório remoto conforme ambiente
-      id: diretorio
+      id: dir
       run: |
-        if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
-          echo "dir=/home/${{ secrets.SERVER_USER }}/prod" >> "$GITHUB_OUTPUT"
-        elif [ "${{ github.event.inputs.environment }}" = "homo" ]; then
-          echo "dir=/home/${{ secrets.SERVER_USER }}/homo" >> "$GITHUB_OUTPUT"
+        BASE="/home/${{ secrets.SERVER_USER }}"
+        ENV="${{ github.event.inputs.environment }}"
+
+        if [ "$ENV" = "prod" ]; then
+          echo "path=$BASE/prod" >> $GITHUB_OUTPUT
+        elif [ "$ENV" = "homo" ]; then
+          echo "path=$BASE/homo" >> $GITHUB_OUTPUT
         else
-          echo "dir=/home/${{ secrets.SERVER_USER }}/dev" >> "$GITHUB_OUTPUT"
+          echo "path=$BASE/dev" >> $GITHUB_OUTPUT
         fi
 
+    # ============================================================
+    # DEFINE COMANDO DE BUILD
+    # ============================================================
     - name: Preparar comando de build
-      id: buildcmd
+      id: build
       run: |
         if [ "${{ github.event.inputs.build_no_cache }}" = "yes" ]; then
-          echo "cmd=docker compose build --no-cache" >> "$GITHUB_OUTPUT"
+          echo "cmd=docker compose build --no-cache" >> $GITHUB_OUTPUT
         else
-          echo "cmd=docker compose build" >> "$GITHUB_OUTPUT"
+          echo "cmd=docker compose build" >> $GITHUB_OUTPUT
         fi
 
+    # ============================================================
+    # DEPLOY REMOTO COM ROLLBACK AUTOMÁTICO
+    # ============================================================
     - name: Executar deploy remoto
       run: |
-        echo "➡️ Iniciando deploy em: ${{ steps.diretorio.outputs.dir }}"
-        echo "➡️ Build command: ${{ steps.buildcmd.outputs.cmd }}"
+        REMOTE_DIR="${{ steps.dir.outputs.path }}"
+        BUILD_CMD="${{ steps.build.outputs.cmd }}"
+        BRANCH="${{ github.event.inputs.branch }}"
 
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+        echo "➡️ Diretório remoto: $REMOTE_DIR"
+        echo "➡️ Branch: $BRANCH"
+        echo "➡️ Build Command: $BUILD_CMD"
+
+        # Comando completo enviado para o SSH
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
           set -e
 
-          echo "📁 Diretório remoto: ${{ steps.diretorio.outputs.dir }}"
-          cd ${{ steps.diretorio.outputs.dir }}
+          rollback() {
+            echo '⚠️ Erro detectado. Executando rollback...'
+            if git rev-parse HEAD@{1} >/dev/null 2>&1; then
+              echo '🔁 Voltando para HEAD@{1}'
+              git reset --hard HEAD@{1}
+              docker compose up -d || true
+            else
+              echo '❌ Não há ponto de rollback disponível'
+            fi
+          }
 
-          echo "🔄 Atualizando repositório"
+          trap rollback ERR
+
+          cd $REMOTE_DIR
+
+          echo '🔄 Sincronizando repositório'
           git fetch --all
-          git reset --hard origin/${{ github.event.inputs.branch }}
+          git reset --hard origin/$BRANCH
 
-          echo "🏗️ Realizando build"
-          ${{ steps.buildcmd.outputs.cmd }}
+          echo '🏗️ Buildando containers'
+          $BUILD_CMD
 
-          echo "🚀 Subindo containers"
+          echo '🚀 Subindo aplicação'
           docker compose up -d
 
-          echo "✅ DEPLOY FINALIZADO COM SUCESSO"
+          echo '✅ Deploy concluído com sucesso'
+        "
