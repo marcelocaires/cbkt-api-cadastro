@@ -12,10 +12,12 @@ on:
           - dev
           - homo
           - prod
+
       branch:
         description: 'Branch para deploy'
         required: true
         default: 'main'
+
       build_no_cache:
         description: 'Forçar rebuild sem cache?'
         required: true
@@ -40,7 +42,7 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-        echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+        echo -e "Host *\n  StrictHostKeyChecking no\n" > ~/.ssh/config
 
     - name: Definir diretório remoto conforme ambiente
       id: diretorio
@@ -53,18 +55,34 @@ jobs:
           echo "dir=/home/${{ secrets.SERVER_USER }}/dev" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Deploy remoto
+    - name: Preparar comando de build
+      id: buildcmd
       run: |
         if [ "${{ github.event.inputs.build_no_cache }}" = "yes" ]; then
-          BUILD_CMD="docker compose build --no-cache"
+          echo "cmd=docker compose build --no-cache" >> "$GITHUB_OUTPUT"
         else
-          BUILD_CMD="docker compose build"
+          echo "cmd=docker compose build" >> "$GITHUB_OUTPUT"
         fi
 
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
-          cd ${{ steps.diretorio.outputs.dir }} &&
-          git fetch --all &&
-          git reset --hard origin/${{ github.event.inputs.branch }} &&
-          \$BUILD_CMD &&
+    - name: Executar deploy remoto
+      run: |
+        echo "➡️ Iniciando deploy em: ${{ steps.diretorio.outputs.dir }}"
+        echo "➡️ Build command: ${{ steps.buildcmd.outputs.cmd }}"
+
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+          set -e
+
+          echo "📁 Diretório remoto: ${{ steps.diretorio.outputs.dir }}"
+          cd ${{ steps.diretorio.outputs.dir }}
+
+          echo "🔄 Atualizando repositório"
+          git fetch --all
+          git reset --hard origin/${{ github.event.inputs.branch }}
+
+          echo "🏗️ Realizando build"
+          ${{ steps.buildcmd.outputs.cmd }}
+
+          echo "🚀 Subindo containers"
           docker compose up -d
-        "
+
+          echo "✅ DEPLOY FINALIZADO COM SUCESSO"
