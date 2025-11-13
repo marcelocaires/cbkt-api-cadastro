@@ -1,0 +1,70 @@
+name: Deploy na Oracle VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Selecione o ambiente'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - homo
+          - prod
+      branch:
+        description: 'Branch para deploy'
+        required: true
+        default: 'main'
+      build_no_cache:
+        description: 'Forçar rebuild sem cache?'
+        required: true
+        type: choice
+        default: 'no'
+        options:
+          - no
+          - yes
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.inputs.branch }}
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+    - name: Definir diretório remoto conforme ambiente
+      id: diretorio
+      run: |
+        if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+          echo "dir=/home/${{ secrets.SERVER_USER }}/prod" >> "$GITHUB_OUTPUT"
+        elif [ "${{ github.event.inputs.environment }}" = "homo" ]; then
+          echo "dir=/home/${{ secrets.SERVER_USER }}/homo" >> "$GITHUB_OUTPUT"
+        else
+          echo "dir=/home/${{ secrets.SERVER_USER }}/dev" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Deploy remoto
+      run: |
+        if [ "${{ github.event.inputs.build_no_cache }}" = "yes" ]; then
+          BUILD_CMD="docker compose build --no-cache"
+        else
+          BUILD_CMD="docker compose build"
+        fi
+
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+          cd ${{ steps.diretorio.outputs.dir }} &&
+          git fetch --all &&
+          git reset --hard origin/${{ github.event.inputs.branch }} &&
+          \$BUILD_CMD &&
+          docker compose up -d
+        "
