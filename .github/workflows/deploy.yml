@@ -1,10 +1,10 @@
-name: Deploy na Oracle VPS
+name: Deploy Spring Boot na Oracle VPS
 
 on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Selecione o ambiente'
+        description: 'Ambiente de destino'
         required: true
         default: 'dev'
         type: choice
@@ -18,107 +18,58 @@ on:
         required: true
         default: 'main'
 
-      build_no_cache:
-        description: 'Forçar rebuild sem cache?'
+      docker_command:
+        description: 'Comando Docker Compose (ex: up -d --build)'
         required: true
-        type: choice
-        default: 'no'
-        options:
-          - no
-          - yes
+        default: 'up -d --build'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout código
-      uses: actions/checkout@v3
+    # ================================================================
+    # 1. Checkout
+    # ================================================================
+    - uses: actions/checkout@v3
       with:
         ref: ${{ github.event.inputs.branch }}
 
-    # ============================================================
-    # SSH CONFIG
-    # ============================================================
+    # ================================================================
+    # 2. Setup SSH
+    # ================================================================
     - name: Setup SSH
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-        
-        # Cria config SSH sem HEREDOC (evita erro de YAML)
-        printf "Host *\n  StrictHostKeyChecking no\n" > ~/.ssh/config
+        echo "Host *" >> ~/.ssh/config
+        echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
-    # ============================================================
-    # MAPEIA DIRETÓRIO REMOTO (dev / homo / prod)
-    # ============================================================
-    - name: Definir diretório remoto conforme ambiente
-      id: dir
+    # ================================================================
+    # 3. Seleção do diretório remoto por ambiente
+    # ================================================================
+    - name: Selecionar diretório remoto
+      id: diretorio
       run: |
-        BASE="/home/${{ secrets.SERVER_USER }}"
-        ENV="${{ github.event.inputs.environment }}"
-
-        if [ "$ENV" = "prod" ]; then
-          echo "path=$BASE/prod" >> $GITHUB_OUTPUT
-        elif [ "$ENV" = "homo" ]; then
-          echo "path=$BASE/homo" >> $GITHUB_OUTPUT
+        if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+          echo "dir=/home/${{ secrets.SERVER_USER }}/cbkt-api-cadastro" >> "$GITHUB_OUTPUT"
+        elif [ "${{ github.event.inputs.environment }}" = "homo" ]; then
+          echo "dir=/home/${{ secrets.SERVER_USER }}/cbkt-api-cadastro" >> "$GITHUB_OUTPUT"
         else
-          echo "path=$BASE/dev" >> $GITHUB_OUTPUT
+          echo "dir=/home/${{ secrets.SERVER_USER }}/cbkt-api-cadastro" >> "$GITHUB_OUTPUT"
         fi
 
-    # ============================================================
-    # DEFINE COMANDO DE BUILD
-    # ============================================================
-    - name: Preparar comando de build
-      id: build
+    # ================================================================
+    # 4. Deploy via SSH — Spring Boot Docker
+    # ================================================================
+    - name: Deploy via SSH
       run: |
-        if [ "${{ github.event.inputs.build_no_cache }}" = "yes" ]; then
-          echo "cmd=docker compose build --no-cache" >> $GITHUB_OUTPUT
-        else
-          echo "cmd=docker compose build" >> $GITHUB_OUTPUT
-        fi
-
-    # ============================================================
-    # DEPLOY REMOTO COM ROLLBACK AUTOMÁTICO
-    # ============================================================
-    - name: Executar deploy remoto
-      run: |
-        REMOTE_DIR="${{ steps.dir.outputs.path }}"
-        BUILD_CMD="${{ steps.build.outputs.cmd }}"
-        BRANCH="${{ github.event.inputs.branch }}"
-
-        echo "➡️ Diretório remoto: $REMOTE_DIR"
-        echo "➡️ Branch: $BRANCH"
-        echo "➡️ Build Command: $BUILD_CMD"
-
-        # Comando completo enviado para o SSH
         ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
-          set -e
-
-          rollback() {
-            echo '⚠️ Erro detectado. Executando rollback...'
-            if git rev-parse HEAD@{1} >/dev/null 2>&1; then
-              echo '🔁 Voltando para HEAD@{1}'
-              git reset --hard HEAD@{1}
-              docker compose up -d || true
-            else
-              echo '❌ Não há ponto de rollback disponível'
-            fi
-          }
-
-          trap rollback ERR
-
-          cd $REMOTE_DIR
-
-          echo '🔄 Sincronizando repositório'
-          git fetch --all
-          git reset --hard origin/$BRANCH
-
-          echo '🏗️ Buildando containers'
-          $BUILD_CMD
-
-          echo '🚀 Subindo aplicação'
-          docker compose up -d
-
-          echo '✅ Deploy concluído com sucesso'
+          cd ${{ steps.diretorio.outputs.dir }} &&
+          git checkout ${{ github.event.inputs.branch }} &&
+          git pull &&
+          docker compose build &&
+          docker compose down &&
+          docker compose ${{ github.event.inputs.docker_command }}
         "
