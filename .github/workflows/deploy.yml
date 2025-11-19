@@ -3,16 +3,6 @@ name: Deploy Spring Boot na Oracle VPS
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Ambiente de destino'
-        required: true
-        default: 'dev'
-        type: choice
-        options:
-          - dev
-          - homo
-          - prod
-
       branch:
         description: 'Branch para deploy'
         required: true
@@ -47,26 +37,12 @@ jobs:
         echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
     # ================================================================
-    # 3. Seleção do diretório remoto por ambiente
-    # ================================================================
-    - name: Selecionar diretório remoto
-      id: diretorio
-      run: |
-        if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
-          echo "dir=/home/${{ secrets.SERVER_USER }}/cbkt-api-cadastro" >> "$GITHUB_OUTPUT"
-        elif [ "${{ github.event.inputs.environment }}" = "homo" ]; then
-          echo "dir=/home/${{ secrets.SERVER_USER }}/cbkt-api-cadastro" >> "$GITHUB_OUTPUT"
-        else
-          echo "dir=/home/${{ secrets.SERVER_USER }}/cbkt-api-cadastro" >> "$GITHUB_OUTPUT"
-        fi
-
-    # ================================================================
-    # 4. Deploy via SSH — Spring Boot Docker
+    # 3. Deploy via SSH — Spring Boot Docker
     # ================================================================
     - name: Deploy via SSH
       run: |
         ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
-          cd ${{ steps.diretorio.outputs.dir }} &&
+          cd /home/${{ secrets.SERVER_USER }}/cbkt-api-cadastro &&
           git checkout ${{ github.event.inputs.branch }} &&
           git pull &&
           docker compose build &&

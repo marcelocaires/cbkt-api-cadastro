@@ -24,10 +24,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Status", description = "Endpoints para verificação de status da API")
 public class StatusController {
 
-    @Value("${spring.application.name:cbkt-api-auth}")
+    @Value("${info.app.name}")
     private String applicationName;
 
-    @Value("${spring.application.version:1.0.0}")
+    @Value("${info.app.version}")
     private String applicationVersion;
 
     /**
