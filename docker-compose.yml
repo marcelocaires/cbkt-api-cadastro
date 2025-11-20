@@ -15,7 +15,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      
+
       - "traefik.docker.network=web"
       # Regra simplificada (PathPrefix já cobre com e sem barra final)
       - "traefik.http.routers.cbkt-cadastro.rule=Host(`cbkt.mmc.dev.br`) && PathPrefix(`/api/cadastro`)"
@@ -40,7 +40,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
 
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health"]
       interval: 30s
       timeout: 10s
       retries: 3
