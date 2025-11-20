@@ -20,7 +20,7 @@ services:
       - "traefik.http.routers.cbkt-cadastro.rule=Host(`cbkt.mmc.dev.br`) && PathPrefix(`/api/cadastro`)"
       - "traefik.http.routers.cbkt-cadastro.entrypoints=websecure"
       - "traefik.http.routers.cbkt-cadastro.tls.certresolver=letsencrypt"
-
+      - "traefik.http.routers.cbkt-cadastro.priority=60"
       # ---- Strip Prefix /api/cadastro ----
       - "traefik.http.middlewares.cbkt-cadastro-stripprefix.stripprefix.prefixes=/api/cadastro"
       - "traefik.http.routers.cbkt-cadastro.middlewares=cbkt-cadastro-stripprefix@docker"
