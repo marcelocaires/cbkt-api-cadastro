@@ -15,17 +15,18 @@ services:
 
     labels:
       - "traefik.enable=true"
-
-      # ---- Roteamento correto ----
-      - "traefik.http.routers.cbkt-cadastro.rule=Host(`cbkt.mmc.dev.br`) && (PathPrefix(`/api/cadastro`) || PathPrefix(`/api/cadastro/`))"
+      
+      # Regra simplificada (PathPrefix já cobre com e sem barra final)
+      - "traefik.http.routers.cbkt-cadastro.rule=Host(`cbkt.mmc.dev.br`) && PathPrefix(`/api/cadastro`)"
       - "traefik.http.routers.cbkt-cadastro.entrypoints=websecure"
       - "traefik.http.routers.cbkt-cadastro.tls.certresolver=letsencrypt"
       - "traefik.http.routers.cbkt-cadastro.priority=60"
-      # ---- Strip Prefix /api/cadastro ----
+      
+      # Strip Prefix
       - "traefik.http.middlewares.cbkt-cadastro-stripprefix.stripprefix.prefixes=/api/cadastro"
       - "traefik.http.routers.cbkt-cadastro.middlewares=cbkt-cadastro-stripprefix@docker"
 
-      # ---- Serviço interno ----
+      # Porta Interna (Garantindo que bata na 8081)
       - "traefik.http.services.cbkt-cadastro.loadbalancer.server.port=8081"
 
     environment:
