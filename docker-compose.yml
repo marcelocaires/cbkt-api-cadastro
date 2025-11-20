@@ -16,6 +16,7 @@ services:
     labels:
       - "traefik.enable=true"
       
+      - "traefik.docker.network=web"
       # Regra simplificada (PathPrefix já cobre com e sem barra final)
       - "traefik.http.routers.cbkt-cadastro.rule=Host(`cbkt.mmc.dev.br`) && PathPrefix(`/api/cadastro`)"
       - "traefik.http.routers.cbkt-cadastro.entrypoints=websecure"
