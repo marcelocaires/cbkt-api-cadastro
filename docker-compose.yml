@@ -17,7 +17,7 @@ services:
       - "traefik.enable=true"
 
       # ---- Roteamento correto ----
-      - "traefik.http.routers.cbkt-cadastro.rule=Host(`cbkt.mmc.dev.br`) && PathPrefix(`/api/cadastro`)"
+      - "traefik.http.routers.cbkt-cadastro.rule=Host(`cbkt.mmc.dev.br`) && (PathPrefix(`/api/cadastro`) || PathPrefix(`/api/cadastro/`))"
       - "traefik.http.routers.cbkt-cadastro.entrypoints=websecure"
       - "traefik.http.routers.cbkt-cadastro.tls.certresolver=letsencrypt"
       - "traefik.http.routers.cbkt-cadastro.priority=60"
