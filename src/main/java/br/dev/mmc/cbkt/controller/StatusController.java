@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,17 +24,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Status", description = "Endpoints para verificação de status da API")
 public class StatusController {
 
-    @Value("${info.app.name}")
-    private String applicationName;
+    private final BuildProperties buildProperties;
 
-    @Value("${info.app.version}")
-    private String applicationVersion;
-
-    /**
-     * Endpoint para verificar se a API está ativa e funcionando
-     * 
-     * @return Informações de status da API
-     */
+    public StatusController(BuildProperties buildProperties) {
+        this.buildProperties = buildProperties;
+    }
+    
     @GetMapping
     @Operation(
         summary = "Verificar status da API",
@@ -44,8 +39,8 @@ public class StatusController {
         Map<String, Object> status = new HashMap<>();
         
         status.put("status", "UP");
-        status.put("application", applicationName);
-        status.put("version", applicationVersion);
+        status.put("application", buildProperties.getName());
+        status.put("version", buildProperties.getVersion());
         status.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         status.put("message", "API está funcionando corretamente");
         
