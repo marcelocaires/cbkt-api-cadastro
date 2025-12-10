@@ -1,5 +1,7 @@
 package br.dev.mmc.cbkt.service;
-
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +30,9 @@ public abstract class CrudServiceImpl<T,ID> implements CrudService<T, ID> {
     }
 
     public T update(ID id, T source) {
-        return repository.save(source);
+        T target = repository.findById(id).orElseThrow();
+        mergeNonNull(source, target);
+        return repository.save(target);
     }
 
     public void delete(ID id) {
@@ -56,4 +60,33 @@ public abstract class CrudServiceImpl<T,ID> implements CrudService<T, ID> {
     public boolean existsById(ID id) {
         return repository.existsById(id);
     }
+
+    public static <T> void mergeNonNull(T source, T target) {
+        for (Field field : source.getClass().getDeclaredFields()) {
+
+            if (Modifier.isStatic(field.getModifiers()) ||
+                Modifier.isFinal(field.getModifiers()) ||
+                field.getName().equals("id")) {
+                continue;
+            }
+
+            field.setAccessible(true);
+
+            try {
+                Object value = field.get(source);
+
+                // IGNORA COLEÇÕES (OneToMany, ManyToMany, etc.)
+                if (value != null && Collection.class.isAssignableFrom(field.getType())) {
+                    continue;
+                }
+
+                if (value != null) {
+                    field.set(target, value);
+                }
+
+            } catch (IllegalAccessException ignored) {}
+        }
+    }
+
+
 }

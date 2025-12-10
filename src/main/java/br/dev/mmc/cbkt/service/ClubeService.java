@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.data.domain.Sort;
 import br.dev.mmc.cbkt.domain.Clube;
 import br.dev.mmc.cbkt.domain.record.AtletaResumoRecord;
 import br.dev.mmc.cbkt.domain.record.ClubeDetalheRecord;
@@ -18,6 +18,12 @@ public class ClubeService extends CrudServiceImpl<Clube, Long> {
     public ClubeService(ClubeRepository repo) {
         super(repo);
         this.repo = repo;
+    }
+
+    @Override
+    public List<Clube> read() {
+        Sort sort = Sort.by(Sort.Direction.ASC, "nome");
+        return repo.findAll(sort);
     }
 
     public ClubeDetalheRecord findDetalheById(Long id) {

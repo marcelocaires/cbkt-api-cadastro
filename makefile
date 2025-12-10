@@ -4,7 +4,7 @@ DB_USER=cbkt
 DB_NAME=cbkt
 
 # Arquivo SQL de seed
-SEED_SQL=script.sql
+SEED_SQL=db/script.sql
 
 ### ===========================
 ### Comandos principais
@@ -13,7 +13,7 @@ SEED_SQL=script.sql
 # Popula sem apagar tabelas (útil pra testes rápidos)
 seed:
 	@echo "===> Populando tabelas via script.sql"
-	docker exec -i $(POSTGRES_CONTAINER) psql -U $(DB_USER) -d $(DB_NAME) -f /db/script.sql
+	docker exec -i $(POSTGRES_CONTAINER) psql -U $(DB_USER) -d $(DB_NAME) -f db/script.sql
 
 # Limpa tudo, reinicia sequences e repopula
 reset-seed:
