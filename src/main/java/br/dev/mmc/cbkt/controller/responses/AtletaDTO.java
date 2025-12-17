@@ -12,6 +12,7 @@ import br.dev.mmc.cbkt.domain.Contato;
 import br.dev.mmc.cbkt.domain.Documentos;
 import br.dev.mmc.cbkt.domain.Endereco;
 import br.dev.mmc.cbkt.domain.Graduacao;
+import br.dev.mmc.cbkt.domain.comparators.AtletaGraduacaoComparators;
 import lombok.Data;
 
 @Data
@@ -83,7 +84,7 @@ public class AtletaDTO {
         this.endereco = atleta.getEndereco();
         this.contato = atleta.getContato();
         this.graduacoes = atleta.getGraduacoes().stream()
-            .sorted((g1, g2) -> g2.getDataGraduacao().compareTo(g1.getDataGraduacao()))
+            .sorted(AtletaGraduacaoComparators.BY_GRAU)
             .toList().reversed();
         this.graduacao = atleta.getGraduacao();
         this.clubes = clubes;

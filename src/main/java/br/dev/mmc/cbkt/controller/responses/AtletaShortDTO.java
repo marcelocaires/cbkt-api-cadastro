@@ -15,8 +15,12 @@ public class AtletaShortDTO {
     public AtletaShortDTO(Atleta atleta) {
         this.id = atleta.getId();
         this.nomeAtleta = atleta.getNomeAtleta();
-        this.nomeClube = atleta.getNomeClube();
-        this.graduacaoDescricao = atleta.getGraduacao().getDescricaoGraduacao();
-        this.graduacaoCorHex = atleta.getGraduacao().getCorHex();
+        if(atleta.getNomeClube() != null) {
+            this.nomeClube = atleta.getNomeClube();
+        }
+        if(atleta.getGraduacao() != null) {
+            this.graduacaoDescricao = atleta.getGraduacao().getDescricaoGraduacao();
+            this.graduacaoCorHex = atleta.getGraduacao().getCorHex();
+        }
     }
 }

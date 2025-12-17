@@ -13,6 +13,7 @@ import br.dev.mmc.cbkt.config.exceptions.CustomBadRequestException;
 import br.dev.mmc.cbkt.config.exceptions.ResourceNotFoundException;
 import br.dev.mmc.cbkt.controller.forms.AtletaClubeForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaClubeTransferirForm;
+import br.dev.mmc.cbkt.controller.forms.AtletaGraduacaoForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaValidarForm;
 import br.dev.mmc.cbkt.controller.responses.AtletaDTO;
 import br.dev.mmc.cbkt.controller.responses.AtletaValidadoRecord;
@@ -20,11 +21,15 @@ import br.dev.mmc.cbkt.domain.Atleta;
 import br.dev.mmc.cbkt.domain.AtletaClube;
 import br.dev.mmc.cbkt.domain.AtletaGraduacao;
 import br.dev.mmc.cbkt.domain.Clube;
+import br.dev.mmc.cbkt.domain.Graduacao;
+import br.dev.mmc.cbkt.domain.comparators.AtletaGraduacaoComparators;
 import br.dev.mmc.cbkt.repository.AtletaClubeRepository;
 import br.dev.mmc.cbkt.repository.AtletaGraduacaoRepository;
 import br.dev.mmc.cbkt.repository.AtletaRepository;
 import br.dev.mmc.cbkt.repository.ClubeRepository;
+import br.dev.mmc.cbkt.repository.GraduacaoRepository;
 import br.dev.mmc.cbkt.util.JodaTimeUtil;
+import br.dev.mmc.cbkt.util.StringUtil;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -32,15 +37,22 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
 
     private final AtletaRepository atletaRepository;
     private final ClubeRepository clubeRepository;
+    private final GraduacaoRepository graduacaoRepository;
     private final AtletaClubeRepository atletaClubeRepository;
     private final AtletaGraduacaoRepository atletaGraduacaoRepository;
 
-    public AtletaService(AtletaRepository repo, AtletaRepository atletaRepository, ClubeRepository clubeRepository, AtletaClubeRepository atletaClubeRepository, AtletaGraduacaoRepository atletaGraduacaoRepository) {
+    public AtletaService(AtletaRepository repo, 
+        AtletaRepository atletaRepository, 
+        ClubeRepository clubeRepository, 
+        AtletaClubeRepository atletaClubeRepository, 
+        AtletaGraduacaoRepository atletaGraduacaoRepository, 
+        GraduacaoRepository graduacaoRepository) {
         super(repo);
         this.atletaRepository = atletaRepository;
         this.clubeRepository = clubeRepository;
         this.atletaClubeRepository = atletaClubeRepository;
         this.atletaGraduacaoRepository = atletaGraduacaoRepository;
+        this.graduacaoRepository = graduacaoRepository;
     }
 
     public Page<Atleta> getAllPage(Pageable pageable, String filtro) {
@@ -71,7 +83,7 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
     }
 
     public List<Atleta> findByNome(String nome) {
-        return atletaRepository.findGraduacoesByFiltro(convertNome(nome),null);
+        return atletaRepository.findGraduacoesByFiltro(StringUtil.convertNome(nome),null);
     }
 
     public List<Atleta> findByCpf(String cpf) {
@@ -118,13 +130,18 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
         atletaClube.setDataAdmissao(form.getDtAdmissao());
         atletaClube.setTransferido(false);
 
+        atleta.setCodigoClube(clube.getId());
+        atleta.setNomeClube(clube.getNome());
+
         atleta.getClubes().add(atletaClube);
         Atleta atletaSave = atletaRepository.save(atleta);
-        return atletaRepository.findAtletaComClubes(atletaSave.getId())
+        
+        List<AtletaClube> atletaClubes = atletaRepository.findAtletaComClubes(atletaSave.getId())
             .get().getClubes()
             .stream()
             .sorted((ac1, ac2) -> ac2.getDataAdmissao().compareTo(ac1.getDataAdmissao()))
             .toList();
+        return atletaClubes;
     }
 
     public List<AtletaClube> removerClube(Long atletaId, Long clubeId) {
@@ -159,19 +176,53 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
         destino.setTransferido(true);
         atletaClubeRepository.save(destino);
 
+        atleta.setCodigoClube(clubeDestino.getId());
+        atleta.setNomeClube(clubeDestino.getNome());
+        atletaRepository.save(atleta);
+
         return atletaRepository.findAtletaComClubes(atleta.getId())
             .get().getClubes()
             .stream()
             .sorted((ac1, ac2) -> ac2.getDataAdmissao().compareTo(ac1.getDataAdmissao()))
             .toList();
     }
-    private String convertNome(String nome) {
-        return "%" + nome
-            .replace("\"", "\\\"")
-            .replace("%", "\\%")
-            .replace("_", "\\_")
-            .toUpperCase()
-            + "%";
+
+    public List<AtletaGraduacao> adicionarGraduacao(AtletaGraduacaoForm form) {
+        Atleta atleta = atletaRepository.findById(form.getAtletaId())
+            .orElseThrow(() -> new ResourceNotFoundException("Atleta não encontrado."));
+        
+        // Lógica para adicionar clube ao atleta aqui
+        Graduacao graduacao = graduacaoRepository.findById(form.getGraduacaoId())
+            .orElseThrow(() -> new ResourceNotFoundException("Graduação não encontrada."));
+
+        AtletaGraduacao atletaGraduacao = new AtletaGraduacao();
+        atletaGraduacao.setAtleta(atleta);
+        atletaGraduacao.setGraduacao(graduacao);
+        atletaGraduacao.setDataExame(form.getDtExame());
+        atletaGraduacao.setNotaExame(form.getNotaExame());
+
+        atleta.getGraduacoes().add(atletaGraduacao);
+        Atleta atletaSave = atletaRepository.save(atleta);
+        List<AtletaGraduacao> graduacoes = atletaRepository.findAtletaComGraduacoes(atletaSave.getId())
+            .get().getGraduacoes()
+            .stream()
+            .sorted(AtletaGraduacaoComparators.BY_GRAU)
+            .toList().reversed();
+        AtletaGraduacao ultimaGraduacao = graduacoes.get(0);
+        atleta.setGraduacao(ultimaGraduacao.getGraduacao());
+        atletaRepository.save(atleta);
+        return graduacoes;
     }
 
+    public List<AtletaGraduacao> removerGraduacao(Long atletaGraduacaoId) {
+        AtletaGraduacao atletaGraduacao = atletaGraduacaoRepository.findById(atletaGraduacaoId)
+            .orElseThrow(() -> new ResourceNotFoundException("Graduação do atleta não encontrada."));
+        Long atletaId = atletaGraduacao.getAtleta().getId();
+        atletaGraduacaoRepository.deleteById(atletaGraduacaoId);
+        return atletaRepository.findAtletaComGraduacoes(atletaId)
+            .get().getGraduacoes()
+            .stream()
+            .sorted(AtletaGraduacaoComparators.BY_GRAU)
+            .toList().reversed();
+    }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.dev.mmc.cbkt.domain.comparators.AtletaGraduacaoComparators;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -19,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -140,4 +142,22 @@ public class Atleta {
     @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = false, fetch = jakarta.persistence.FetchType.LAZY)
     @Builder.Default
     private List<AtletaGraduacao> graduacoes = new ArrayList<>();
+
+    public AtletaGraduacao getUltimaGraduacao() {
+        if(this.graduacoes == null || this.graduacoes.isEmpty()){
+            return null;
+        }
+        return this.graduacoes.stream()
+            .max(AtletaGraduacaoComparators.BY_GRAU)
+            .orElse(null);
+    }
+
+    public AtletaClube getUltimoClube(){
+        if(this.clubes == null || this.clubes.isEmpty()){
+            return null;
+        }
+        return this.clubes.stream()
+            .max((c1, c2) -> c1.getDataAdmissao().compareTo(c2.getDataAdmissao()))
+            .orElse(null);
+    }
 }

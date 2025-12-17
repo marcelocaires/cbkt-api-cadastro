@@ -1,6 +1,6 @@
 package br.dev.mmc.cbkt.domain;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -43,8 +43,8 @@ public class AtletaGraduacao {
     private Graduacao graduacao;
 
     @Column(name = "DATAGRADUACAO")
-    private LocalDate dataGraduacao;
+    private Date dataExame;
 
     @Column(name = "NOTAGRADUACAO")
-    private Double notaGraduacao;
+    private Double notaExame;
 }

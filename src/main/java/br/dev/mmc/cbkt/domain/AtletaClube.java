@@ -43,7 +43,7 @@ public class AtletaClube {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CODIGOATLETA", nullable = false)
     private Atleta atleta;
-
+    
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CODIGOCLUBE", nullable = false)
     private Clube clube;

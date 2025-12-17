@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.dev.mmc.cbkt.controller.forms.AtletaClubeForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaClubeTransferirForm;
+import br.dev.mmc.cbkt.controller.forms.AtletaGraduacaoForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaValidarForm;
 import br.dev.mmc.cbkt.controller.responses.AtletaDTO;
 import br.dev.mmc.cbkt.controller.responses.AtletaShortDTO;
@@ -165,5 +166,31 @@ public class AtletaController extends CrudController<Atleta, Long> {
     )
     public List<AtletaClube> removerClube(@PathVariable Long atletaId, @PathVariable Long clubeId) {
         return atletaService.removerClube(atletaId, clubeId);
+    }
+
+    @PostMapping("/graduacao")
+    @Operation(
+        summary = "Adiciona uma graduação a um atleta.",
+        description = """
+            Adiciona uma graduação ao atleta com base nos dados fornecidos.
+            - Retorna o histórico de graduações do atleta.
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public List<AtletaGraduacao> adicionarGraduacao(@RequestBody @Valid AtletaGraduacaoForm form) {
+        return atletaService.adicionarGraduacao(form);
+    }
+
+    @DeleteMapping("/graduacao/{atletaGraduacaoId}")
+    @Operation(
+        summary = "Remove uma graduação de um atleta.",
+        description = """
+            Remove uma graduação do atleta com base nos dados fornecidos.
+            - Retorna o histórico de graduações do atleta.
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public List<AtletaGraduacao> removerGraduacao(@PathVariable Long atletaGraduacaoId) {
+        return atletaService.removerGraduacao(atletaGraduacaoId);
     }
 }
