@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.dev.mmc.cbkt.domain.Cargo;
 import br.dev.mmc.cbkt.domain.enums.GraduacaoCorEnum;
 import br.dev.mmc.cbkt.domain.enums.GraduacaoGrauEnum;
+import br.dev.mmc.cbkt.service.MandatoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -19,6 +21,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/parametros")
 @Tag(name = "Parâmetros", description = "Endpoints para consultar enums e parâmetros do sistema")
 public class ParametrosController {
+
+    private final MandatoService mandatoService;
+
+    public ParametrosController(MandatoService mandatoService) {
+        this.mandatoService = mandatoService;
+    }
 
     @GetMapping("/graduacao/cores")
     @Operation(
@@ -46,5 +54,5 @@ public class ParametrosController {
             .collect(Collectors.toList());
         
         return ResponseEntity.ok(graus);
-    }
+    }  
 }

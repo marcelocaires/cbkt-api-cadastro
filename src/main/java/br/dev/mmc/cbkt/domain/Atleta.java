@@ -12,6 +12,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,7 +21,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -103,7 +103,22 @@ public class Atleta {
     @Column(name = "PCD")
     private Boolean pcd;
 
-    @Column(name = "URL_FOTO", length = 255)
+    @Column(name = "IS_PCD")
+    private Boolean isPcd;
+
+    @Column(name = "DEFICIENCIA_DESCRICAO")
+    private String deficienciaDescricao;
+
+    @Column(name = "DEFICIENCIA_TIPO")
+    private String deficienciaTipo;   
+
+    @Column(name = "DEFICIENCIA_CID")
+    private String deficienciaCID;       
+
+    @Column(name = "URL_LAUDO_MEDICO", columnDefinition = "TEXT")
+    private String urlLaudoMedico;      
+
+    @Column(name = "URL_FOTO", columnDefinition = "TEXT")
     private String urlFoto;
 
     @Column(name = "DATAFAIXA")
@@ -134,12 +149,12 @@ public class Atleta {
     private Contato contato;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = jakarta.persistence.FetchType.LAZY)
+    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<AtletaClube> clubes = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = false, fetch = jakarta.persistence.FetchType.LAZY)
+    @OneToMany(mappedBy = "atleta", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     @Builder.Default
     private List<AtletaGraduacao> graduacoes = new ArrayList<>();
 

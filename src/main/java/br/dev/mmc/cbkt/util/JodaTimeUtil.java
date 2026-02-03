@@ -135,6 +135,10 @@ public class JodaTimeUtil {
 	public static LocalDate parseStringMonthYearBRtoLocalDate(String dt){
 		return LocalDate.parse(dt,DF_MONTH_YEAR_BR).dayOfMonth().withMinimumValue();
 	}
+
+	public static java.time.LocalDate parseStringDateBRtoLavaLocalDate(String dt){
+		return java.time.LocalDate.parse(dt);
+	}
 	
 	//Comparações
 	public static boolean checkLocalDateIgualOuAnterior(LocalDate dt, LocalDate dtRef) {

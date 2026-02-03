@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,9 +18,11 @@ import br.dev.mmc.cbkt.controller.forms.AtletaClubeForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaClubeTransferirForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaGraduacaoForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaValidarForm;
+import br.dev.mmc.cbkt.controller.forms.UpdateAtletaPcdForm;
 import br.dev.mmc.cbkt.controller.responses.AtletaDTO;
 import br.dev.mmc.cbkt.controller.responses.AtletaShortDTO;
 import br.dev.mmc.cbkt.controller.responses.AtletaValidadoRecord;
+import br.dev.mmc.cbkt.controller.responses.MessageResponseRecord;
 import br.dev.mmc.cbkt.domain.Atleta;
 import br.dev.mmc.cbkt.domain.AtletaClube;
 import br.dev.mmc.cbkt.domain.AtletaGraduacao;
@@ -192,5 +195,18 @@ public class AtletaController extends CrudController<Atleta, Long> {
     )
     public List<AtletaGraduacao> removerGraduacao(@PathVariable Long atletaGraduacaoId) {
         return atletaService.removerGraduacao(atletaGraduacaoId);
+    }
+
+    @PutMapping("/pcd")
+    @Operation(
+        summary = "Atualiza as informações de PCD de um atleta.",
+        description = """
+            Atualiza as informações relacionadas a Pessoa com Deficiência (PCD) do atleta com base nos dados fornecidos.
+            - Retorna os detalhes atualizados do atleta.
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public MessageResponseRecord atualizarAtletaPCD(@RequestBody @Valid UpdateAtletaPcdForm form) {
+        return new MessageResponseRecord(atletaService.atualizarAtletaPCD(form));  
     }
 }

@@ -15,6 +15,7 @@ import br.dev.mmc.cbkt.controller.forms.AtletaClubeForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaClubeTransferirForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaGraduacaoForm;
 import br.dev.mmc.cbkt.controller.forms.AtletaValidarForm;
+import br.dev.mmc.cbkt.controller.forms.UpdateAtletaPcdForm;
 import br.dev.mmc.cbkt.controller.responses.AtletaDTO;
 import br.dev.mmc.cbkt.controller.responses.AtletaValidadoRecord;
 import br.dev.mmc.cbkt.domain.Atleta;
@@ -88,6 +89,10 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
 
     public List<Atleta> findByCpf(String cpf) {
         return atletaRepository.findGraduacoesByFiltro(null, cpf);
+    }
+
+    public Atleta getByCpf(String cpf) {
+        return atletaRepository.getByCpf(cpf).orElse(null);
     }
 
     public List<AtletaGraduacao> findGraduacoesById(Long id) {
@@ -224,5 +229,25 @@ public class AtletaService extends CrudServiceImpl<Atleta, Long> {
             .stream()
             .sorted(AtletaGraduacaoComparators.BY_GRAU)
             .toList().reversed();
+    }
+
+    public String atualizarAtletaPCD(UpdateAtletaPcdForm form) {
+        Atleta atleta = atletaRepository.findById(form.id())
+            .orElseThrow(() -> new ResourceNotFoundException("Atleta não encontrado."));
+        if(!form.isPcd()) {
+            atleta.setIsPcd(false);
+            atleta.setDeficienciaTipo(null);
+            atleta.setDeficienciaDescricao(null);
+            atleta.setDeficienciaCID(null);
+            atleta.setUrlLaudoMedico(null);
+        }else{
+            atleta.setIsPcd(form.isPcd());
+            atleta.setDeficienciaTipo(form.deficienciaTipo());
+            atleta.setDeficienciaDescricao(form.deficienciaDescricao());
+            atleta.setDeficienciaCID(form.deficienciaCID());
+            atleta.setUrlLaudoMedico(form.urlLaudoMedico());
+        }
+        atletaRepository.save(atleta);
+        return "Atleta PCD atualizado com sucesso.";
     }
 }

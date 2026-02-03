@@ -14,8 +14,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import br.dev.mmc.cbkt.domain.Atleta;
-import br.dev.mmc.cbkt.domain.AtletaClube;
-import br.dev.mmc.cbkt.domain.AtletaGraduacao;
 
 public interface AtletaRepository extends JpaRepository<Atleta, Long>, JpaSpecificationExecutor<Atleta> {
     Optional<Atleta> findByNomeAtleta(String nome);
@@ -28,6 +26,9 @@ public interface AtletaRepository extends JpaRepository<Atleta, Long>, JpaSpecif
     @EntityGraph(type = EntityGraph.EntityGraphType.LOAD,attributePaths = {"graduacoes","graduacoes.graduacao"})
     @Query("select a from Atleta a where a.id = :id")
     Optional<Atleta> findAtletaComGraduacoes(@Param("id") Long id);
+
+    @Query("select a from Atleta a where a.documentos.cpf = :cpf")
+    Optional<Atleta> getByCpf(@Param("cpf") String cpf);
 
     // Carrega o atleta + histórico de clubes (Atleta.clubes -> AtletaClube.clube)
     @EntityGraph(type = EntityGraph.EntityGraphType.LOAD,attributePaths = {"clubes","clubes.clube"})

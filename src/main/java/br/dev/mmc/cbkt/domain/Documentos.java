@@ -16,7 +16,7 @@ import lombok.Setter;
 @Embeddable
 public class Documentos {
 
-    @Column(name = "CPFATLETA", length = 14)
+    @Column(unique = true,name = "CPFATLETA", length = 14)
     private String cpf;
 
     @Column(name = "RG_NUMERO", length = 20)

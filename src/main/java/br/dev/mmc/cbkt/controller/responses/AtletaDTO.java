@@ -50,6 +50,11 @@ public class AtletaDTO {
     private Endereco endereco;
     private Contato contato;
     private Graduacao graduacao;
+    private Boolean isPcd;
+    private String deficienciaDescricao;
+    private String deficienciaTipo;
+    private String deficienciaCID;
+    private String urlLaudoMedico;
     private List<AtletaClube> clubes;
     private List<AtletaGraduacao> graduacoes;
 
@@ -88,5 +93,10 @@ public class AtletaDTO {
             .toList().reversed();
         this.graduacao = atleta.getGraduacao();
         this.clubes = clubes;
+        this.isPcd = atleta.getIsPcd();
+        this.deficienciaDescricao = atleta.getDeficienciaDescricao();
+        this.deficienciaTipo = atleta.getDeficienciaTipo();
+        this.deficienciaCID = atleta.getDeficienciaCID();
+        this.urlLaudoMedico = atleta.getUrlLaudoMedico();
     }
 }
