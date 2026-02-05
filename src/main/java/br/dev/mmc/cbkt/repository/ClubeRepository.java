@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import br.dev.mmc.cbkt.domain.Clube;
+import br.dev.mmc.cbkt.domain.enums.TipoEntidade;
 import jakarta.persistence.criteria.Predicate;
 
 public interface ClubeRepository extends BaseRepository<Clube, Long>, JpaSpecificationExecutor<Clube> {
@@ -54,5 +55,46 @@ public interface ClubeRepository extends BaseRepository<Clube, Long>, JpaSpecifi
             // Retorna a união obrigatória (preFiltro AND filtroDinamico)
             return cb.and(preFiltro, filtroDinamico);
         };
-    }    
+    }   
+
+    //Especificação para filtro por nome, graduação e clube
+    static Specification<Clube> confederacaoFiltro(String filtro) {
+        return (root, cq, cb) -> {
+            // Filtro prévio obrigatório: classificacao deve conter "clube"
+            Predicate preFiltro = cb.like(root.get("classificacao"),TipoEntidade.CONFEDERACAO.toString());
+            if (filtro == null || filtro.isBlank()) {
+                //retorna a consulta sem filtros
+                return preFiltro;
+            }
+
+            String like = "%" + filtro.trim().toLowerCase() + "%";
+            Predicate filtroDinamico = cb.or(
+                cb.like(cb.lower(root.get("nome")), like),
+                cb.like(cb.lower(root.get("abreviatura")), like)
+            );
+
+            // Retorna a união obrigatória (preFiltro AND filtroDinamico)
+            return cb.and(preFiltro, filtroDinamico);
+        };
+    }   
+        //Especificação para filtro por nome, graduação e clube
+    static Specification<Clube> federacaoFiltro(String filtro) {
+        return (root, cq, cb) -> {
+            // Filtro prévio obrigatório: classificacao deve conter "clube"
+            Predicate preFiltro = cb.like(root.get("classificacao"),TipoEntidade.FEDERACAO.toString());
+            if (filtro == null || filtro.isBlank()) {
+                //retorna a consulta sem filtros
+                return preFiltro;
+            }
+
+            String like = "%" + filtro.trim().toLowerCase() + "%";
+            Predicate filtroDinamico = cb.or(
+                cb.like(cb.lower(root.get("nome")), like),
+                cb.like(cb.lower(root.get("abreviatura")), like)
+            );
+
+            // Retorna a união obrigatória (preFiltro AND filtroDinamico)
+            return cb.and(preFiltro, filtroDinamico);
+        };
+    } 
 }
