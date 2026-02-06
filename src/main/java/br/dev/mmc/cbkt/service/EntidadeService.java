@@ -121,4 +121,52 @@ public class EntidadeService extends CrudServiceImpl<Clube, Long> {
         PageRequest pageable = PageRequest.of(0, 10, Sort.by("nome").ascending());
         return repo.findAll(ClubeRepository.confederacaoFiltro(null),pageable);
     }
+
+    public Clube createEntidade(Clube entidade) {
+        if (entidade.getId() != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID deve ser nulo para criação");
+        }
+        if (entidade.getNome() == null || entidade.getNome().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome é obrigatório");
+        }
+        return repo.save(entidade);
+    }
+
+    public Clube updateEntidade(Long id, Clube entidade) {
+        Clube entidadeExistente = repo.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade não encontrada"));
+        
+        if (entidade.getNome() != null && !entidade.getNome().trim().isEmpty()) {
+            entidadeExistente.setNome(entidade.getNome());
+        }
+        if (entidade.getAbreviatura() != null) {
+            entidadeExistente.setAbreviatura(entidade.getAbreviatura());
+        }
+        if (entidade.getClassificacao() != null) {
+            entidadeExistente.setClassificacao(entidade.getClassificacao());
+        }
+        if (entidade.getCnpj() != null) {
+            entidadeExistente.setCnpj(entidade.getCnpj());
+        }
+        if (entidade.getEndereco() != null) {
+            entidadeExistente.setEndereco(entidade.getEndereco());
+        }
+        if (entidade.getContato() != null) {
+            entidadeExistente.setContato(entidade.getContato());
+        }
+        return repo.save(entidadeExistente);
+    }
+
+    public void inativarEntidade(Long id) {
+        Clube entidade = repo.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade não encontrada"));
+        repo.save(entidade);
+    }
+
+    public void removerEntidade(Long id) {
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade não encontrada");
+        }
+        repo.deleteById(id);
+    }
 }

@@ -5,14 +5,18 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.dev.mmc.cbkt.controller.forms.EntidadeForm;
 import br.dev.mmc.cbkt.controller.responses.ClubeComMandatosDto;
 import br.dev.mmc.cbkt.domain.Clube;
 import br.dev.mmc.cbkt.service.EntidadeService;
@@ -84,11 +88,67 @@ public class EntidadeController{
         return ResponseEntity.ok(detalhe);
     }    
 
-    @PostMapping("/{tipo}")
-    public String postMethodName(
-        @PathVariable String tipo, 
-        @RequestBody String entity) {        
-        return entity;
+    @PostMapping
+    @Operation(
+        summary = "Cria uma nova entidade.",
+        description = """
+            Cria uma nova entidade (Clube, Federação ou Confederação).
+            - O ID deve ser nulo.
+            - O nome é obrigatório.
+            - A entidade é criada como ativa por padrão.
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public ResponseEntity<Clube> createEntidade(@RequestBody EntidadeForm form) {
+        Clube novaEntidade = service.createEntidade(form.toEntity());
+        return ResponseEntity.status(201).body(novaEntidade);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(
+        summary = "Atualiza uma entidade existente.",
+        description = """
+            Atualiza os dados de uma entidade existente.
+            - O ID deve ser informado na URL.
+            - Apenas os campos informados serão atualizados.
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public ResponseEntity<Clube> updateEntidade(
+        @PathVariable Long id,
+        @RequestBody Clube entidade) {
+        Clube entidadeAtualizada = service.updateEntidade(id, entidade);
+        return ResponseEntity.ok(entidadeAtualizada);
+    }
+
+    @PatchMapping("/{id}/inativar")
+    @Operation(
+        summary = "Inativa uma entidade.",
+        description = """
+            Inativa uma entidade sem removê-la do banco de dados.
+            - O ID deve ser informado na URL.
+            - A entidade terá o status 'ativo' alterado para false.
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public ResponseEntity<Void> inativarEntidade(@PathVariable Long id) {
+        service.inativarEntidade(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(
+        summary = "Remove uma entidade.",
+        description = """
+            Remove permanentemente uma entidade do banco de dados.
+            - O ID deve ser informado na URL.
+            - Esta operação não pode ser desfeita.
+            - Esse endpoint exige autenticação.
+        """
+    )
+    public ResponseEntity<Void> removerEntidade(@PathVariable Long id) {
+        service.removerEntidade(id);
+        return ResponseEntity.noContent().build();
     }
     
 }
